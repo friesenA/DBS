@@ -10,37 +10,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import javax.xml.ws.Endpoint;
-
-import org.customer.webservice.CustomerBankObj;
-import org.manager.webservice.ManagerBankObj;
+import udp.PackageProcessor;
 
 public class Server {
 
 	public static void main(String[] args) {
 		
 		final int UDPPortBase = 6500;
-		final int WSPortBase = 8080;
 
 		HashMap<Character, ArrayList<Account>> records = new HashMap<Character, ArrayList<Account>>();
 		
 		String branch = args[0];
 		int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
-		int WSserverPortNum = WSPortBase + Branches.valueOf(branch).getValue();
 
 		// Database Initialization steps
 		populateDefaultRecords(records, branch);
 
 		try {
 
-			// Publish endpoints
-			Endpoint.publish("http://localhost:"+WSserverPortNum+"/WS/CustomerBank",new CustomerBankObj(records, branch));
-			Endpoint.publish("http://localhost:"+WSserverPortNum+"/WS/ManagerBank",new ManagerBankObj(records, branch));
-
-			System.out.println(branch + " server ready ...");
-
 			// Socket UDP/IP
 			DatagramSocket aSocket = null;
+			byte[] buffer = new byte[1000];
 			
 			System.out.println(branch + " UDP server started ...");
 
@@ -48,42 +38,11 @@ public class Server {
 				try {
 					aSocket = new DatagramSocket(UDPserverPortNum);
 					final DatagramSocket socket = aSocket;
-					byte[] buffer = new byte[1000];
-					while (true) {
-						DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-						socket.receive(packet);
-						System.out.println("Recieved message.");
-						byte[] in = new byte[packet.getLength()];
-						System.arraycopy(packet.getData(), packet.getOffset(), in, 0, packet.getLength());
-						//parse String into arguments
-						ArrayList<String> arguments = parse(new String(in));
-						//Count Accounts
-						if ((new String(in)).equals("accountCount")) {
-							// find number of records
-							int numRecords = findNumOfRecords(records);
-							// package numRecords and branch name
-							String pair = branch + "," + numRecords;
-							byte[] message = pair.getBytes();
-							DatagramPacket reply = new DatagramPacket(message, pair.length(), packet.getAddress(),packet.getPort());
-							socket.send(reply);
-							System.out.println("Response sent.");
-						}
-						//Transfer Funds
-						else if(arguments.get(0).equals("transferFund")){
-							//Make deposit
-							CustomerBankObj c = new CustomerBankObj(records, branch);
-							double amount = (new Double(arguments.get(2)).doubleValue());
-							String depositMessage = c.deposit(arguments.get(1), amount);
-							//send reply
-							byte[] message = depositMessage.getBytes();
-							DatagramPacket reply = new DatagramPacket(message, depositMessage.length(), packet.getAddress(),packet.getPort());
-							socket.send(reply);
-							System.out.println("Response sent.");
-						}
-						else{
-							//Do nothing
-						}
-					}
+					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+					socket.receive(packet);
+					System.out.println("Recieved message.");
+					PackageProcessor pp = new PackageProcessor(packet, records, branch);
+					pp.run();
 				} catch (SocketException e) {
 					System.out.println("Socket: " + e.getMessage());
 				} catch (IOException e) {
@@ -149,18 +108,6 @@ public class Server {
 			arguments.add(argument);
 		}
 		return arguments;
-	}
-
-	// --------------------------------------------
-	// find the number of records in the hashmap
-	// ---------------------------------------------
-	private static int findNumOfRecords(HashMap<Character, ArrayList<Account>> records) {
-		int size = 0;
-		// add size of each arraylist together
-		for (int i = 0; i < 26; i++) {
-			size += records.get((char) ('A' + i)).size();
-		}
-		return size;
 	}
 
 }

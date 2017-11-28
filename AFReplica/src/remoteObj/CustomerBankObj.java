@@ -13,12 +13,9 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.AbstractMap.SimpleEntry;
 
-import javax.jws.WebService;
-
 import server.Account;
 import server.Branches;
 
-@WebService(endpointInterface="org.customer.webservice.CustomerBank")
 public class CustomerBankObj implements CustomerBank {
 
 	private HashMap<Character, ArrayList<Account>> records;
@@ -49,14 +46,14 @@ public class CustomerBankObj implements CustomerBank {
 		// Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if (a == null) {
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 
 		// Make Deposit
 		double newBalance = a.deposit(amt);
-		message = "Success, $" + amt + " was added and the new balance is $" + newBalance;
+		message = "Success, the new balance is $" + newBalance;
 		log(header + message);
 		return message;
 	}
@@ -72,21 +69,21 @@ public class CustomerBankObj implements CustomerBank {
 		// Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if (a == null) {
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 
 		SimpleEntry<Boolean, Double> result = a.withdraw(amt);
 		if (!result.getKey()) {
-			message = "Failure, insufficient funds to withdraw " + amt;
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 
 		// Do Withdrawl
 		double newBalance = result.getValue();
-		message = "Success, $" + amt + " was withdrawn and the new balance is $" + newBalance;
+		message = "Success, the new balance is $" + newBalance;
 		log(header + message);
 		return message;
 	}
@@ -102,7 +99,7 @@ public class CustomerBankObj implements CustomerBank {
 		// Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if (a == null) {
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -152,13 +149,13 @@ public class CustomerBankObj implements CustomerBank {
 				result = parse(answer);
 				//money return fails SHOULD NEVER HAPPEN!!!!!!!! Just here to catch an error in the system
 				if(result.get(0).equals("Failure")){
-					message += ", An error occured and the money could not be returned to the source";
+					message = "Failure";
 					log(header + message);
 					return message;
 				}
 				//money return successful
 				else{
-					message += ", Transaction could not be completed and the money was redeposited with the source";
+					message = "Failure";
 					log(header + message);
 					return message;
 				}
@@ -166,7 +163,7 @@ public class CustomerBankObj implements CustomerBank {
 			
 			//Successful Deposit to destination
 			else{
-				message += ", Transfer was a success";
+				message = "Success";
 				log(header + message);
 				return message;
 			}
