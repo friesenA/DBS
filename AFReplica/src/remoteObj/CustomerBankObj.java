@@ -135,7 +135,7 @@ public class CustomerBankObj implements CustomerBank {
 			int portNum = UDPPortBase + Branches.valueOf(destinationCustomerID.substring(0, 2)).getValue();
 			
 			//send deposit request
-			String request = "transferFund," + destinationCustomerID + "," + amount; 
+			String request = "transferFundInternal," + destinationCustomerID + "," + amount; 
 			String answer = this.sendUDPrequest(request, portNum);
 			//validate success or failure
 			message += ", " + answer;

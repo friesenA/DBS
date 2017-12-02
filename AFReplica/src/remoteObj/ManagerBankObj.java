@@ -135,7 +135,7 @@ public class ManagerBankObj implements ManagerBank{
 		//Send request to each server for the number of accounts
 		String answer = "";
 		for(int i=0; i < Branches.values().length; i++){
-			answer += sendUDPrequest("accountCount", UDPPortBase + i);
+			answer += sendUDPrequest("accountCountInternal", UDPPortBase + i);
 			answer += " ";
 		}
 		return answer;
@@ -268,7 +268,7 @@ public class ManagerBankObj implements ManagerBank{
 			int portNum = UDPPortBase + Branches.valueOf(destinationCustomerID.substring(0, 2)).getValue();
 			
 			//send deposit request
-			String request = "transferFund," + destinationCustomerID + "," + amount; 
+			String request = "transferFundInternal," + destinationCustomerID + "," + amount; 
 			String answer = this.sendUDPrequest(request, portNum);
 			//validate success or failure
 			message += ", " + answer;
