@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,14 +35,22 @@ public class Server {
 			byte[] buffer = new byte[1000];
 			
 			System.out.println(branch + " UDP server started ...");
+			
+			MulticastSocket socket = new MulticastSocket(4000);
+			InetAddress group = InetAddress.getByName("230.0.0.0");
+			socket.joinGroup(group);
 
 			while (true) {
 				try {
-					aSocket = new DatagramSocket(UDPserverPortNum);
+					/*aSocket = new DatagramSocket(UDPserverPortNum);
 					final DatagramSocket socket = aSocket;
 					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 					socket.receive(packet);
 					System.out.println("Recieved message.");
+					PackageProcessor pp = new PackageProcessor(packet, records, branch);
+					pp.run();*/
+					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+					socket.receive(packet);
 					PackageProcessor pp = new PackageProcessor(packet, records, branch);
 					pp.run();
 				} catch (SocketException e) {
@@ -48,8 +58,9 @@ public class Server {
 				} catch (IOException e) {
 					System.out.println("IO: " + e.getMessage());
 				} finally {
-					if (aSocket != null)
-						aSocket.close();
+					if (socket != null)
+						socket.leaveGroup(group);
+						socket.close();
 				}
 			}
 		}

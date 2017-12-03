@@ -3,7 +3,6 @@ package server;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -16,8 +15,8 @@ public class ManagerBankObj extends ManagerBankPOA {
 
 	private ORB orb;
 
-	int sequencerPortNum;
-	String sequencerIP;
+	int sequencerPortNum = 9876;
+	String sequencerIP = "localhost";
 
 	protected ManagerBankObj() {
 		super();
