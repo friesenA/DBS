@@ -30,8 +30,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 	// Create Account
 	// --------------------------------------------
 	@Override
-	public String createAccountRecord(String managerID, String firstName, String lastName, String address, String phone,
-			String branch) {
+	public String createAccountRecord(String managerID, String firstName, String lastName, String address, String phone, String branch) {
 		String message = "createAccountRecord," + managerID + "," + firstName + "," + lastName + "," + address + ","
 				+ phone + "," + branch;
 		String answer = sendUDPrequest(message, sequencerPortNum);

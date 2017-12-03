@@ -56,7 +56,7 @@ public class PackageProcessor extends Thread {
 				sendReply(message, a, p);
 			}
 			//Withdraw
-			else if(arguments.get(2).equals("withdraw")){
+			else if(arguments.get(3).equals("withdraw")){
 				String message = "";
 				if(arguments.size() == 6){
 					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
@@ -74,7 +74,7 @@ public class PackageProcessor extends Thread {
 				sendReply(message, a, p);
 			}
 			//GetBalance
-			else if(arguments.get(2).equals("getBalance")){
+			else if(arguments.get(3).equals("getBalance")){
 				String message = "";
 				if(arguments.size() == 6){
 					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
@@ -90,16 +90,52 @@ public class PackageProcessor extends Thread {
 				sendReply(message, a, p);
 			}
 			//TransferFund
-			else if(arguments.get(2).equals("transferFund")){
+			else if(arguments.get(3).equals("transferFund")){
+				String message = "";
+				if(arguments.size() == 7){
+					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
+					double amount = (new Double(arguments.get(5)).doubleValue());
+					message = c.transferFund(arguments.get(4), amount, arguments.get(6));
+				}
+				else if (arguments.size() == 8){
+					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+					double amount = (new Double(arguments.get(6)).doubleValue());
+					message = m.transferFund(arguments.get(4), arguments.get(5), amount, arguments.get(7));
+				}
 				
+				InetAddress a = InetAddress.getByName(arguments.get(1));
+				int p = Integer.parseInt(arguments.get(2));
+				sendReply(message, a, p);
 			}
 			//CreateAccountRecord
-			else if(arguments.get(2).equals("createAccountRecord")){
+			else if(arguments.get(3).equals("createAccountRecord")){
+				String message = "";
+				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+				message = m.createAccountRecord(arguments.get(4), arguments.get(5), arguments.get(6), arguments.get(7), arguments.get(8), arguments.get(9));
 				
+				InetAddress a = InetAddress.getByName(arguments.get(1));
+				int p = Integer.parseInt(arguments.get(2));
+				sendReply(message, a, p);
 			}
 			//EditRecord
-			else if(arguments.get(2).equals("editRecord")){
+			else if(arguments.get(3).equals("editRecord")){
+				String message = "";
+				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+				message = m.editRecord(arguments.get(4), arguments.get(5), arguments.get(6), arguments.get(7));
 				
+				InetAddress a = InetAddress.getByName(arguments.get(1));
+				int p = Integer.parseInt(arguments.get(2));
+				sendReply(message, a, p);
+			}
+			//AccountCount
+			else if(arguments.get(3).equals("getAccountCount")){
+				String message = "";
+				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+				message = m.getAccountCount(arguments.get(4));
+				
+				InetAddress a = InetAddress.getByName(arguments.get(1));
+				int p = Integer.parseInt(arguments.get(2));
+				sendReply(message, a, p);
 			}
 			
 			//*****************************INTERNAL*METHODCALL**********************************************************//
