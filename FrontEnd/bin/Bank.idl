@@ -1,0 +1,22 @@
+module BankModule
+{
+	
+	interface ManagerBank
+	{
+		string createAccountRecord(in string managerID, in string firstName, in string lastName, in string address, in string phone, in string branch);
+		string editRecord(in string managerID, in string customerID, in string fieldName, in string newValue);
+		string getAccountCount(in string managerID);
+		string deposit(in string managerID, in string customerID, in double amt);
+		string withdraw(in string managerID, in string customerID, in double amt);
+		string getBalance(in string managerID, in string customerID);
+		string transferFund(in string managerID, in string sourceCustomerID, in double amount, in string destinationCustomerID);
+	};
+
+	interface CustomerBank
+	{
+		string deposit(in string customerID, in double amt);
+		string withdraw(in string customerID, in double amt);
+		string getBalance(in string customerID);
+		string transferFund(in string sourceCustomerID, in double amount, in string destinationCustomerID);
+	};
+};

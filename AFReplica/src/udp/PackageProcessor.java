@@ -78,13 +78,11 @@ public class PackageProcessor extends Thread {
 				String message = "";
 				if(arguments.size() == 6){
 					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(5)).doubleValue());
-					message = c.withdraw(arguments.get(4), amount);
+					message = c.getBalance(arguments.get(4));
 				}
 				else if (arguments.size() == 7){
 					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(6)).doubleValue());
-					message = m.withdraw(arguments.get(4), arguments.get(5), amount);
+					message = m.getBalance(arguments.get(4), arguments.get(5));
 				}
 				
 				InetAddress a = InetAddress.getByName(arguments.get(1));
