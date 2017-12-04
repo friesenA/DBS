@@ -1,0 +1,7 @@
+QCM1298,David,Bradshaw,Brossard,345-8907,Quebec,3998.0
+QCC2567,Alisha,Ball,Brossard,345-2389,Quebec,5713.0
+QCC6591,Jessica,Crosby,Montreal,365-7982,Quebec,6137.0
+QCC5656,Kimberly,Chan,Brossard,345-6789,Quebec,3698.0
+QCC1200,Bianca,Johnson,brossard,345-7890,Quebec,5900.0
+QCC4587,Kathy,Luo,brossard,456-9807,Quebec,2945.0
+QCC9898,Christine,Nakamura,brossard,567-7890,Quebec,7490.0

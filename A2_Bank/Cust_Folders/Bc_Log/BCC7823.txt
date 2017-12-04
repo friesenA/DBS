@@ -1,0 +1,2 @@
+User retrieved account balance, total balance: $4590.0
+Successfully deposit $400.0, total balance: $4990.0

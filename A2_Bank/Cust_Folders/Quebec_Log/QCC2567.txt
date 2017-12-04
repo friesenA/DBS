@@ -1,0 +1,2 @@
+Successfully withdrawal $100.0, total balance: $5713.67
+User retrieved account balance, total balance: $5713.67

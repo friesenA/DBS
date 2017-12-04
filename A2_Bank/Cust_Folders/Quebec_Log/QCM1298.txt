@@ -1,0 +1,20 @@
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+User retrieved account balance, total balance: $3598.45
+Successfully withdrawal $100.0, total balance: $3498.45
+User retrieved account balance, total balance: $3598.45
+Successfully withdrawal $100.0, total balance: $3498.45
+User retrieved account balance, total balance: $3498.45
+Successfully deposit $500.0, total balance: $4098.45
+Successfully deposit $200.0, total balance: $3798.0
+User retrieved account balance, total balance: $3798.0
+User retrieved account balance, total balance: $3598.0
+User retrieved account balance, total balance: $3598.0
+Successfully deposit $200.0, total balance: $3798.0
+Successfully deposit $200.0, total balance: $3998.0
+User retrieved account balance, total balance: $3998.0

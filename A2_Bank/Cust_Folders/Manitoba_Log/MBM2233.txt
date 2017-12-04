@@ -1,0 +1,1 @@
+User retrieved account balance, total balance: $3598.45

@@ -1,0 +1,14 @@
+module bankObjApp
+{
+  interface bankObj
+  {
+    string deposit(in string custId, in double amount);
+    string withdrawal(in string custId,in double amount);
+    double getBalance(in string custId);
+    string createAccountRecord(in string custId, in string fname, in string lname, in string address, in string phone, in string branch, in double amount);
+    string editRecord(in string custId, in string fieldname, in string newValue);
+    string transferFund(in string sourceId, in double amount, in string destinationId);
+    string getCount();
+    oneway void shutdown();
+  };
+};
