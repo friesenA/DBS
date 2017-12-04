@@ -2,8 +2,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
+import UDP.MulticastListener;
+import UDP.UDPSocketListener;
 
 public class ReplicaManager implements Runnable {
 	
@@ -290,7 +294,28 @@ public class ReplicaManager implements Runnable {
 	 * Receives sequencer requests and sends ACKs
 	 */
 	private void receiveRequests(){
+		MulticastSocket msocket = null;
+		InetAddress group = null;
+		DatagramSocket socket = null;
+		MulticastListener ml = null;
+		UDPSocketListener ul = null;
+		
 		try {
+			ArrayList<DatagramPacket> incommingBuffer = new ArrayList<DatagramPacket>();
+			//Multicast Setup
+			msocket = new MulticastSocket(4000);
+			group = InetAddress.getByName("230.0.0.0");
+			ml = new MulticastListener(msocket, group, incommingBuffer);
+			ml.start();
+			
+			//Unicast Setup
+			//socket = new DatagramSocket(port);
+			//ul = new UDPSocketListener(socket, incommingBuffer);
+			//ul.start();
+
+			//handle buffer
+			
+			
 			receiveSequencer = new DatagramSocket(port);
 			System.out.println("Testing requests to RM. Socket started.");
 			while (true) {
@@ -353,8 +378,15 @@ public class ReplicaManager implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (receiveSequencer != null){
-				receiveSequencer.close();
+			try {
+				ul.exit();
+				ml.exit();
+				ul.join();
+				ml.join();
+				socket.close();
+				msocket.close();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
