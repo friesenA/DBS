@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -15,7 +16,7 @@ public class ReplicaManager implements Runnable {
 	private boolean isRebooting = false;
 	private Thread VM;
 	int[] otherRMs;
-	DatagramSocket receiveSequencer = null;
+	MulticastSocket receiveSequencer = null;
 	private static int lastSequenceID;
 	ArrayList<DatagramPacket> holdBackBuffer = null;
 	ArrayList<DatagramPacket> deliveryBuffer = null;
@@ -291,7 +292,7 @@ public class ReplicaManager implements Runnable {
 	 */
 	private void receiveRequests(){
 		try {
-			receiveSequencer = new DatagramSocket(port);
+			receiveSequencer = new MulticastSocket(port);
 			System.out.println("Testing requests to RM. Socket started.");
 			while (true) {
 				byte[] receiveData = new byte[1024];
@@ -300,11 +301,12 @@ public class ReplicaManager implements Runnable {
 				
 				DatagramPacket packet = new DatagramPacket(receiveData, receiveData.length);
 				receiveSequencer.receive(packet);
-				InetAddress IPAddress = packet.getAddress();
+				InetAddress group = InetAddress.getByName("230.0.0.0");
 				String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
 				arguments = parse(request);
 				int sequenceID = Integer.parseInt(arguments.get(0));
-				
+	
+				//holdBackBuffer.add(packet);
 				// Compare incoming request sequence ID with last sequence ID received
 				// Case if it is smaller or equal to the last sequence ID
 				if (sequenceID <= lastSequenceID){
