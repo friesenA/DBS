@@ -10,12 +10,12 @@ public class ReplicaManager implements Runnable {
 	private Process replica;
 	private int port;
 	private int sequencerPort;
-	private int frontEndPort;
 	private int replicaPort;
 	private String replicaPath; 
 	private boolean isRebooting = false;
 	private Thread VM;
 	int[] otherRMs;
+	DatagramSocket receiveSequencer = null;
 	private static int lastSequenceID;
 	ArrayList<DatagramPacket> holdBackBuffer = null;
 	ArrayList<DatagramPacket> deliveryBuffer = null;
@@ -152,7 +152,7 @@ public class ReplicaManager implements Runnable {
 	 * Request handler.. for now
 	 * @param arguments
 	 */
-	public void handleRequest(String[] arguments, int port){
+	public void handleRequest(DatagramPacket packet, String[] arguments, int port){
 
 		if (arguments[2].equalsIgnoreCase("deposit")){
 			if (arguments[3].substring(2, 3).equals("C")){
@@ -160,6 +160,7 @@ public class ReplicaManager implements Runnable {
 				String customerID = arguments[3];
 				String branchId = customerID.substring(0, 2);  // BRANCH ID QB,MB,NB,BC
 				int portNum = findReplica(status, branchId);
+				forwardToReplica(portNum, packet);
 				double amount = Double.parseDouble(arguments[4]);
 			}
 			else if (arguments[3].substring(2,3).equals("M")){
@@ -262,17 +263,26 @@ public class ReplicaManager implements Runnable {
 		return portNum;
 	}
 	
-	
 	/**
-	 * Validates order of sequence numbers
-	 * @param sequenceID
-	 * @return
+	 * Forwards message to replica
+	 * @param port
+	 * @param operation
 	 */
-	public boolean validateSequenceID(int sequenceID){
-		if (sequenceID - lastSequenceID >= 2){
-			return false;
-		} else {
-			return true;
+	private void forwardToReplica(int branchPort, DatagramPacket packet){
+		DatagramSocket socket = null;
+		try{
+			socket = new DatagramSocket(port);
+			while (true) {
+				packet.setPort(branchPort);
+				socket.send(packet);
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (socket != null) {
+				socket.close();
+			}
 		}
 	}
 	
@@ -280,47 +290,45 @@ public class ReplicaManager implements Runnable {
 	 * Receives sequencer requests and sends ACKs
 	 */
 	private void receiveRequests(){
-		DatagramSocket socket = null;
 		try {
-			socket = new DatagramSocket(port);
+			receiveSequencer = new DatagramSocket(port);
 			System.out.println("Testing requests to RM. Socket started.");
 			while (true) {
 				byte[] receiveData = new byte[1024];
 				byte[] sendData = new byte[1024];
-			
 				ArrayList<String> arguments = null;
 				
 				DatagramPacket packet = new DatagramPacket(receiveData, receiveData.length);
-				socket.receive(packet);
+				receiveSequencer.receive(packet);
 				InetAddress IPAddress = packet.getAddress();
 				String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
 				arguments = parse(request);
 				int sequenceID = Integer.parseInt(arguments.get(0));
-				if (sequenceID < lastSequenceID){
-					// Ignore request -- to do
+				
+				// Compare incoming request sequence ID with last sequence ID received
+				// Case if it is smaller or equal to the last sequence ID
+				if (sequenceID <= lastSequenceID){
+					// Ignore request
 				}
+				// Case if it is bigger than last sequence ID
 				else {
+					
+					// If it is bigger by 2 or more
 					if(sequenceID - lastSequenceID >= 2){
 					holdBackBuffer.add(packet);
 					}
 					else {
+						if(sequenceID == lastSequenceID +1){
 						deliveryBuffer.add(packet);
-					}
-				}
-				
-				for (int i=0; i<holdBackBuffer.size(); i++){
-					String req = new String(holdBackBuffer.get(i).getData(), holdBackBuffer.get(i).getOffset(), holdBackBuffer.get(i).getLength());
-					ArrayList<String> args = parse(req);
-					int seqID = Integer.parseInt(args.get(0));
-					if (seqID < lastSequenceID){
-						// Ignore request
-					}
-					else {
-						if(validateSequenceID(seqID)){
-							
+						lastSequenceID++;
+						// Send ACKs to other RMs -- to do
 						}
 					}
 				}
+				
+				// Iterate through holdBackBuffer to see if the next sequence is stored in it
+				findNextSequence();
+			
 				
 				/*
 				String arguments[] = request.split(",");
@@ -345,8 +353,8 @@ public class ReplicaManager implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (socket != null){
-				socket.close();
+			if (receiveSequencer != null){
+				receiveSequencer.close();
 			}
 		}
 	}
@@ -368,13 +376,30 @@ public class ReplicaManager implements Runnable {
 		return arguments;
 	}
 	
-	public void iterateHoldBackBuffer(ArrayList<DatagramPacket> holdBackBuffer){
-		
+	/**
+	 * Iterate through holdBackBuffer to see if next sequence is stored in it
+	 * @return
+	 */
+	public void findNextSequence(){
+		for (int i=0; i<holdBackBuffer.size(); i++){
+			String req = new String(holdBackBuffer.get(i).getData(), holdBackBuffer.get(i).getOffset(), holdBackBuffer.get(i).getLength());
+			ArrayList<String> args = parse(req);
+			int seqID = Integer.parseInt(args.get(0));
+			
+			// If next sequence is found in holdBackBuffer, remove it from there and add to deliveryBuffer
+			if(seqID == lastSequenceID + 1 ){
+				deliveryBuffer.add(holdBackBuffer.get(i));
+				lastSequenceID++;
+				holdBackBuffer.remove(i);
+				//send acks to other RMs -- To do
+			}
+			else{
+				// send resend request to sequencer asking for next sequence (lastSequenceID+1)
+				// requestResend(lastSequenceID+1)
+			}
+		}
 	}
 	
-
-	
-
 	@Override
 	public void run() {
 //		initializeReplica();
