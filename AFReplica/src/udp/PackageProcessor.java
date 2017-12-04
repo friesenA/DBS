@@ -76,11 +76,11 @@ public class PackageProcessor extends Thread {
 			//GetBalance
 			else if(arguments.get(3).equals("getBalance")){
 				String message = "";
-				if(arguments.size() == 6){
+				if(arguments.size() == 5){
 					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
 					message = c.getBalance(arguments.get(4));
 				}
-				else if (arguments.size() == 7){
+				else if (arguments.size() == 6){
 					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
 					message = m.getBalance(arguments.get(4), arguments.get(5));
 				}

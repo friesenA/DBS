@@ -126,7 +126,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 						responses.add(response);
 						packetBuffer.remove(0);
 					}
-					else if (arguments.get(1).equals("recieved")){
+					else if (arguments.get(1).equals("received")){
 						sequencerTimeout = false;
 						packetBuffer.remove(0);
 					}
