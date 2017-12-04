@@ -5,3 +5,7 @@
 
 
 
+2017-12-03 21:25:28: balance for QCM1111 - 
+2017-12-03 21:29:20: balance for QCM1111 - 
+
+2017-12-03 21:36:43: balance for QCM1111 - Success, the balance is $5000.0

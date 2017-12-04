@@ -18,38 +18,43 @@ import udp.PackageProcessor;
 public class Server {
 
 	public static void main(String[] args) {
-		
+
 		final int UDPPortBase = 6500;
 
 		HashMap<Character, ArrayList<Account>> records = new HashMap<Character, ArrayList<Account>>();
-		
+
 		String branch = args[0];
-		//int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
+		// int UDPserverPortNum = UDPPortBase +
+		// Branches.valueOf(branch).getValue();
 
 		// Database Initialization steps
 		populateDefaultRecords(records, branch);
 
+		MulticastSocket socket = null;
+		InetAddress group = null;
 		try {
 
 			// Socket UDP/IP
 			DatagramSocket aSocket = null;
 			byte[] buffer = new byte[1000];
-			
+
 			System.out.println(branch + " UDP server started ...");
-			
-			MulticastSocket socket = new MulticastSocket(4000);
-			InetAddress group = InetAddress.getByName("230.0.0.0");
+
+			socket = new MulticastSocket(4000);
+			group = InetAddress.getByName("230.0.0.0");
 			socket.joinGroup(group);
 
 			while (true) {
 				try {
-					/*aSocket = new DatagramSocket(UDPserverPortNum);
-					final DatagramSocket socket = aSocket;
-					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-					socket.receive(packet);
-					System.out.println("Recieved message.");
-					PackageProcessor pp = new PackageProcessor(packet, records, branch);
-					pp.run();*/
+					/*
+					 * aSocket = new DatagramSocket(UDPserverPortNum); final
+					 * DatagramSocket socket = aSocket; DatagramPacket packet =
+					 * new DatagramPacket(buffer, buffer.length);
+					 * socket.receive(packet);
+					 * System.out.println("Recieved message."); PackageProcessor
+					 * pp = new PackageProcessor(packet, records, branch);
+					 * pp.run();
+					 */
 					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 					socket.receive(packet);
 					PackageProcessor pp = new PackageProcessor(packet, records, branch);
@@ -58,16 +63,21 @@ public class Server {
 					System.out.println("Socket: " + e.getMessage());
 				} catch (IOException e) {
 					System.out.println("IO: " + e.getMessage());
-				} finally {
-					if (socket != null)
-						socket.leaveGroup(group);
-						socket.close();
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.err.println("ERROR: " + e);
 			e.printStackTrace(System.out);
+		} finally {
+			if (socket != null) {
+				try {
+					socket.leaveGroup(group);
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
 		}
 
 		System.out.println(branch + " Server Exiting ...");

@@ -140,7 +140,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 			listener = new UDPSocketListener(socket, packetBuffer, request);
 			
 			socket.send(request);
-			listener.run();
+			listener.start();
 
 			long start = System.currentTimeMillis();
 			boolean sequencerTimeout = true;
@@ -152,7 +152,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 					System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
 					String response = (new String(in));
 					// parse String into arguments
-					ArrayList<String> arguments = parse(answer);
+					ArrayList<String> arguments = parse(response);
 					if (arguments.get(0).equals("Success") || arguments.get(0).equals("Failure")) {
 						// record source
 						responses.add(response);
@@ -201,6 +201,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 							//handle byzantine at i
 						}
 					}
+					break;
 				}	
 			}
 		} catch (Exception e) {
@@ -216,6 +217,18 @@ public class ManagerBankObj extends ManagerBankPOA {
 			}
 		}
 		return answer;
+	}
+	
+	// -------------------------------------------
+	// Handle Crash Failure
+	// -------------------------------------------
+	
+	// -------------------------------------------
+	// Handle Byzantine Failure
+	// -------------------------------------------
+	
+	private void handleByzantine(){
+		
 	}
 
 	// --------------------------------------------------------------CORBA-METHODS----------------------------------------------------------------//
