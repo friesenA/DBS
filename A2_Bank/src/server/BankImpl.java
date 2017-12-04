@@ -22,9 +22,6 @@ import server.Customer;
 
 public class BankImpl{
 	
-	// Orb variables
-	private ORB orb;
-	
 	// Hashmap variables for storing customer info
 	private List <Customer> customerRecords = new ArrayList();
 	private HashMap <String, List> database = new HashMap <String, List> ();
@@ -34,10 +31,6 @@ public class BankImpl{
 	private int totalCustAmt = 0;
 	private String dbFile = "";
 	
-	public void setORB(ORB orb_val)
-	{
-		orb = orb_val;
-	}
 	
 	
 	public BankImpl(String branchId, int portNum) throws Exception
@@ -265,6 +258,7 @@ public class BankImpl{
 			bw.close();
 			
 			updateDatabase(dbFile);
+			//return "Success" + custId + " account created";
 		}
 		else
 		{
@@ -279,8 +273,10 @@ public class BankImpl{
 			bw.close();
 			
 			updateDatabase(dbFile);
+			//return "Success" + custId + " account created";
 		}
-		return "User account successfully created";
+		
+		return "Success" + custId + " account created";
 	}
 	
 	
@@ -341,7 +337,7 @@ public class BankImpl{
 						
 						updateDatabase(dbFile);
 						
-						return "Successfully edited " + fieldName + " to " + newValue;
+						return "Success";
 						
 					}
 				}
@@ -350,10 +346,10 @@ public class BankImpl{
 		}
 		else
 		{
-			return "Sorry, please specify the correct fieldname to edit.";
+			return "Failure";
 		}
 		
-		return "User account successfully edited";
+		return "Success";
 	}
 	
 	

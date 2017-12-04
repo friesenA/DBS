@@ -12,10 +12,14 @@ import java.util.List;
 
 public class Server2 {
 	
+	private static List <BankImpl> serverNames = new ArrayList();
+	private static BankImpl bankBranch = null;
+	private static String[] serverInitial = {"qc", "bc", "mb", "nb"};
+	
 	public static void main(String args[]) throws IOException
 	{
-		List <BankImpl> serverNames = new ArrayList();
-		String[] serverInitial = {"qc", "bc", "mb", "nb"};
+		
+		
 		
 		try{
 			// Creating server for each branch
@@ -59,12 +63,12 @@ public class Server2 {
 			if(sentence.equalsIgnoreCase("count") == true)
 			{
 				String size = "";
-				
+				replyMsg = "Success, ";
 				// Get all users from every branch and combine them into one huge string response message
 				for(int i = 0; i < serverNames.size(); i++)
 				{
 					size = serverNames.get(i).getCount();
-					replyMsg += serverInitial[i].toUpperCase() + " Server : " + size + " users \n";
+					replyMsg += serverInitial[i].toUpperCase() + " " + size + ", ";
 				}
 			}
 			else if(transferMsg[0].equalsIgnoreCase("transfer") == true)
@@ -72,10 +76,9 @@ public class Server2 {
 				boolean status = true;
 				String initialSource = transferMsg[1].substring(0, 2).toLowerCase();
 				String initialDestination = transferMsg[3].substring(0, 2).toLowerCase();
-				System.out.println(initialSource + "   " + initialDestination);
 				
 				for(int i = 0; i < serverNames.size(); i++)
-				{System.out.println(i);
+				{
 				    // This handles the withdrawal, withdrawal always has to go first, that is where status variable comes to play
 					if(initialSource.equalsIgnoreCase(serverInitial[i]) && status == true)
 					{
@@ -88,22 +91,47 @@ public class Server2 {
 						}
 						else
 						{
-							replyMsg = "Sorry, you cannot withdrawal that much money.";
+							replyMsg = "Failure";
 						}
 					}
 					// This handles the deposit once the withdrawal is made
 					else if(initialDestination.equalsIgnoreCase(serverInitial[i]) && status == false)
 					{
 						serverNames.get(i).deposit(transferMsg[3], Double.parseDouble(transferMsg[2]));
-						replyMsg = "Successfully transfer fund to account.";
+						replyMsg = "Success";
 						i = 10;  // Skip for loop once deposit is completed
 						System.out.println("deposit good");
 					}
 					else
 					{
-						replyMsg = "Sorry, invalid username, cannot identify server.";
+						replyMsg = "Failure";
 					}
 				}
+			}
+			else if(transferMsg[0].equalsIgnoreCase("deposit") == true)
+			{
+				bankBranch = getBranch(transferMsg[1]);  // must fill it with the branch initial
+				replyMsg = bankBranch.deposit(transferMsg[2], Double.parseDouble(transferMsg[3]));
+			}
+			else if(transferMsg[0].equalsIgnoreCase("withdrawal"))
+			{
+				bankBranch = getBranch(transferMsg[1]);  // must fill it with the branch initial
+				replyMsg = bankBranch.withdrawal(transferMsg[2], Double.parseDouble(transferMsg[3]));
+			}
+			else if(transferMsg[0].equalsIgnoreCase("balance"))
+			{
+				bankBranch = getBranch(transferMsg[1]);  // must fill it with the branch initial
+				replyMsg = bankBranch.getBalance(transferMsg[2]);
+			}
+			else if(transferMsg[0].equalsIgnoreCase("create"))
+			{
+				bankBranch = getBranch(transferMsg[1]);  // must fill it with the branch initial
+				//replyMsg = bankBranch.createAccountRecord(custId, fname, lname, custAddress, custPhone, custBranch, custBalance)
+			}
+			else if(transferMsg[0].equalsIgnoreCase("edit"))
+			{
+				bankBranch = getBranch(transferMsg[1]);  // must fill it with the branch initial
+				//replyMsg = bankBranch.editRecord(custId, fieldName, newValue);
 			}
 			
 			sendData = replyMsg.getBytes();
@@ -122,7 +150,20 @@ public class Server2 {
 	
 	
 	
-	
+	public static BankImpl getBranch(String initial)
+	{
+		BankImpl server = null;
+		
+		for(int i = 0; i < serverInitial.length; i++)
+		{
+			if(initial.equalsIgnoreCase(serverInitial[i]))
+			{
+				server = serverNames.get(i);
+			}
+		}
+		
+		return server;
+	}
 	
 	
 	// IGNORE IT TEMPORARY LEFT IT HERE JUST TO MAKE IT WORK
