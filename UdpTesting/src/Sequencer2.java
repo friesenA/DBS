@@ -18,6 +18,8 @@ public class Sequencer2 implements Runnable {
 	private DatagramPacket receivePacket;
 	private DatagramPacket sendPacket;
 	
+	private static String requestId;
+	
 	public static void main(String [] args) throws IOException
 	{
 		Sequencer2 sequencer = new Sequencer2();
@@ -96,7 +98,7 @@ public class Sequencer2 implements Runnable {
 			saveRequestMessage(msgRm);
 			
 			// Successful message should be in the seq to rm method, get response, timeout implementation needed
-			String replyClient = "Successful";
+			String replyClient = requestId + ",received";
 			
 			
 			sendData = replyClient.getBytes();
@@ -145,6 +147,7 @@ public class Sequencer2 implements Runnable {
 	public static synchronized String addSequencerNum(String sentence, int port, String address)
 	{
 		String[] arrSentence = sentence.split(",");
+		requestId = arrSentence[0];
 		arrSentence[0] = Integer.toString(sequenceId);
 		
 		String addSeq = arrSentence[0] + "," + address + "," + port;
