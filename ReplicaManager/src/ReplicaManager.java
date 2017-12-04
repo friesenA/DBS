@@ -64,85 +64,17 @@ public class ReplicaManager implements Runnable {
 	 * @param arguments
 	 */
 	public void handleRequest(DatagramPacket packet){
+		
 		ArrayList<String> arguments = new ArrayList<String>();
 		String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
 		arguments = parse(request);
-		
-		if (arguments.get(2).equalsIgnoreCase("deposit")){
-			if (arguments.get(3).substring(2, 3).equals("C")){
-				String customerID = arguments.get(3);
-				String branchId = customerID.substring(0,2);  // BRANCH ID QB,MB,NB,BC
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-				double amount = Double.parseDouble(arguments.get(4));
-			}
-			else if (arguments.get(3).substring(2,3).equals("M")){
-				String managerID = arguments.get(3);
-				String customerID = arguments.get(4);
-				String branchId = customerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-				double amount = Double.parseDouble(arguments.get(5));
-			}
-		}
-		else if (arguments.get(2).equalsIgnoreCase("withdraw")){
-			if (arguments.get(3).substring(2, 3).equals("C")){
-				String customerID = arguments.get(3);
-				String branchId = customerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-				double amount = Double.parseDouble(arguments.get(4));
-			}
-			else if (arguments.get(3).substring(2, 3).equals("M")){
-				String managerID = arguments.get(3);
-				String customerID = arguments.get(4);
-				String branchId = customerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-				double amount = Double.parseDouble(arguments.get(5));
-			}
-		}
-		else if (arguments.get(2).equalsIgnoreCase("getBalance")){
-			if (arguments.get(3).substring(2, 3).equals("C")){
-				String customerID = arguments.get(3);
-				String branchId = customerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				
-			}
-			else if (arguments.get(3).substring(2, 3).equals("M")){
-				String managerID = arguments.get(3);
-				String customerID = arguments.get(4);
-				String branchId = customerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-			}
-		}
-		else if (arguments.get(2).equalsIgnoreCase("getAccountCount")){
-			String managerID = arguments.get(3);
-			String branchId = managerID.substring(0, 2);
-			int portNum = findReplicaPort(branchId);
-			forwardToReplica(portNum, packet);
-		}
-		else if (arguments.get(2).equalsIgnoreCase("transferFund")){
-			if (arguments.get(3).substring(2, 3).equals("C")){
-				String srcCustomerID = arguments.get(3);
-				double amount = Double.parseDouble(arguments.get(4));
-				String destCustomerID = arguments.get(5);
-				String branchId = destCustomerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-			}
-			else if (arguments.get(3).substring(2, 3).equals("M")){
-				String managerID = arguments.get(3);
-				String srcCustomerID = arguments.get(4);
-				double amount = Double.parseDouble(arguments.get(5));
-				String destCustomerID = arguments.get(6);
-				String branchId = destCustomerID.substring(0, 2);
-				int portNum = findReplicaPort(branchId);
-				forwardToReplica(portNum, packet);
-			}
-		}
+		String ID = arguments.get(3);
+		String branchId = ID.substring(0,2);  // BRANCH ID QB,MB,NB,BC
+		int portNum = findReplicaPort(branchId);
+		forwardToReplica(portNum, packet);
 	}
+		
+	
 	
 	/**
 	 * Maps the replicas' port numbers
@@ -247,7 +179,7 @@ public class ReplicaManager implements Runnable {
 						deliveryBuffer.add(incomingBuffer.get(i));
 						lastSequenceID++;
 						incomingBuffer.remove(i);
-						handleRequest(deliveryBuffer.get(0));
+						handleRequest(incomingBuffer.get(i));
 						//send acks to other RMs and execute sequence -- To do
 					}
 					else{
