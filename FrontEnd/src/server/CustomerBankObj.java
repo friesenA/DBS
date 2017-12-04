@@ -39,7 +39,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 	// --------------------------------------
 	@Override
 	public String withdraw(String customerID, double amt) {
-		String message = "deposit," + customerID + "," + amt;
+		String message = "withdraw," + customerID + "," + amt;
 		String answer = sendUDPrequest(message, sequencerPortNum);
 		return answer;
 	}
@@ -49,7 +49,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 	// -------------------------------------
 	@Override
 	public String getBalance(String customerID) {
-		String message = "deposit," + customerID;
+		String message = "getBalance," + customerID;
 		String answer = sendUDPrequest(message, sequencerPortNum);
 		return answer;
 	}
@@ -59,7 +59,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 	// -------------------------------------
 	@Override
 	public String transferFund(String sourceCustomerID, double amount, String destinationCustomerID) {
-		String message = "deposit," + sourceCustomerID + "," + amount + "," + destinationCustomerID;
+		String message = "transferFund," + sourceCustomerID + "," + amount + "," + destinationCustomerID;
 		String answer = sendUDPrequest(message, sequencerPortNum);
 		return answer;
 	}
@@ -97,8 +97,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 			InetAddress host = InetAddress.getByName(sequencerIP);
 
 			// modify message
-			Date d = new Date();
-			message = d.getTime() + "," + socket.getInetAddress().getHostAddress() + "," + socket.getPort() + "," + message;
+			message = System.currentTimeMillis() + "," + message;
 
 			// send request
 			byte[] m = message.getBytes();
