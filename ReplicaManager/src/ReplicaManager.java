@@ -251,7 +251,7 @@ public class ReplicaManager implements Runnable {
 			}
 			else
 			{
-				portNum = 5404;
+				portNum = 6504;
 			}
 		}
 		else  // Brandon implementation

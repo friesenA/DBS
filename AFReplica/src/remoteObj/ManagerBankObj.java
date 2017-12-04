@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.AbstractMap.SimpleEntry;
 
-import server.Account;
 import server.Branches;
+import server.Account;
 
 public class ManagerBankObj implements ManagerBank{
 	

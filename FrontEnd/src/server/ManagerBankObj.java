@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.StringTokenizer;
 
 import org.omg.CORBA.ORB;
@@ -335,7 +334,6 @@ public class ManagerBankObj extends ManagerBankPOA {
 			System.arraycopy(response.getData(), response.getOffset(), in, 0, response.getLength());
 			String answer = (new String(in));
 			// parse String into arguments
-			ArrayList<String> arguments = parse(answer);
 			int ans = Integer.parseInt(answer);
 
 			//Analyze response and craft update
