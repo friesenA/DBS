@@ -44,7 +44,10 @@ public class Sequencer2 implements Runnable {
 		
 		String sentence = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength());
 		InetAddress IPAddress = receivePacket.getAddress();
+		String ipAddress = IPAddress.toString();
+		ipAddress = ipAddress.substring(1);
 		int port = receivePacket.getPort();
+		System.out.println(ipAddress + "  " + Integer.toString(port));
 		
 		
 		
@@ -84,7 +87,7 @@ public class Sequencer2 implements Runnable {
 			System.out.println("\n Client request received");
 			
 			// Replace and add sequence id into message
-			String msgRm = addSequencerNum(sentence);
+			String msgRm = addSequencerNum(sentence, port, ipAddress);
 							
 			// Multicast message to all replica managers
 			String multicastResponse = multicastRm(msgRm);
@@ -139,12 +142,12 @@ public class Sequencer2 implements Runnable {
 	
 	
 	// Add the sequence id to the message and increment the sequence id
-	public static synchronized String addSequencerNum(String sentence)
+	public static synchronized String addSequencerNum(String sentence, int port, String address)
 	{
 		String[] arrSentence = sentence.split(",");
 		arrSentence[0] = Integer.toString(sequenceId);
 		
-		String addSeq = arrSentence[0];
+		String addSeq = arrSentence[0] + "," + address + "," + port;
 		
 		for(int i = 1; i < arrSentence.length; i++)
 		{
