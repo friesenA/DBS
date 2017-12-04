@@ -19,7 +19,7 @@ public class ReplicaManager implements Runnable {
 	private boolean isRebooting = false;
 	private Thread VM;
 	int[] otherRMs;
-	DatagramSocket receiveSequencer = null;
+	MulticastSocket receiveSequencer = null;
 	private static int lastSequenceID;
 	ArrayList<DatagramPacket> holdBackBuffer = null;
 	ArrayList<DatagramPacket> deliveryBuffer = null;
@@ -301,6 +301,9 @@ public class ReplicaManager implements Runnable {
 		UDPSocketListener ul = null;
 		
 		try {
+<<<<<<< HEAD
+			receiveSequencer = new MulticastSocket(port);
+=======
 			ArrayList<DatagramPacket> incommingBuffer = new ArrayList<DatagramPacket>();
 			//Multicast Setup
 			msocket = new MulticastSocket(4000);
@@ -317,6 +320,7 @@ public class ReplicaManager implements Runnable {
 			
 			
 			receiveSequencer = new DatagramSocket(port);
+>>>>>>> 6e5d3318b76c258a502815d1046a9807af0b37e5
 			System.out.println("Testing requests to RM. Socket started.");
 			while (true) {
 				byte[] receiveData = new byte[1024];
@@ -325,11 +329,12 @@ public class ReplicaManager implements Runnable {
 				
 				DatagramPacket packet = new DatagramPacket(receiveData, receiveData.length);
 				receiveSequencer.receive(packet);
-				InetAddress IPAddress = packet.getAddress();
+				InetAddress group = InetAddress.getByName("230.0.0.0");
 				String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
 				arguments = parse(request);
 				int sequenceID = Integer.parseInt(arguments.get(0));
-				
+	
+				//holdBackBuffer.add(packet);
 				// Compare incoming request sequence ID with last sequence ID received
 				// Case if it is smaller or equal to the last sequence ID
 				if (sequenceID <= lastSequenceID){
