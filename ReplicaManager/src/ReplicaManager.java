@@ -20,9 +20,8 @@ public class ReplicaManager implements Runnable {
 	private Thread VM;
 	int[] otherRMs;
 	MulticastSocket receiveSequencer = null;
-	private static int lastSequenceID;
-	ArrayList<DatagramPacket> holdBackBuffer = null;
-	ArrayList<DatagramPacket> deliveryBuffer = null;
+	private int lastSequenceID;
+	
 	private boolean status = true;  // TRUE = AMANDA, FALSE = BRANDON
 	
 	public ReplicaManager(int port, int replicaPort, int sequencerPort){//, int[] otherRMs, String replicaPath){
@@ -153,89 +152,96 @@ public class ReplicaManager implements Runnable {
 	}
 	
 	/**
-	 * Request handler.. for now
+	 * Handle request to forward to appropriate branch
 	 * @param arguments
 	 */
-	public void handleRequest(DatagramPacket packet, String[] arguments, int port){
-
-		if (arguments[2].equalsIgnoreCase("deposit")){
-			if (arguments[3].substring(2, 3).equals("C")){
-				// Execute customer deposit -- to do!
-				String customerID = arguments[3];
-				String branchId = customerID.substring(0, 2);  // BRANCH ID QB,MB,NB,BC
+	public void handleRequest(DatagramPacket packet){
+		ArrayList<String> arguments = new ArrayList<String>();
+		String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
+		arguments = parse(request);
+		
+		if (arguments.get(2).equalsIgnoreCase("deposit")){
+			if (arguments.get(3).substring(2, 3).equals("C")){
+				String customerID = arguments.get(3);
+				String branchId = customerID.substring(0,2);  // BRANCH ID QB,MB,NB,BC
 				int portNum = findReplica(status, branchId);
 				forwardToReplica(portNum, packet);
-				double amount = Double.parseDouble(arguments[4]);
+				double amount = Double.parseDouble(arguments.get(4));
 			}
-			else if (arguments[3].substring(2,3).equals("M")){
-				// Execute manager deposit -- to do!
-				String managerID = arguments[3];
-				String customerID = arguments[4];
+			else if (arguments.get(3).substring(2,3).equals("M")){
+				String managerID = arguments.get(3);
+				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
-				double amount = Double.parseDouble(arguments[5]);
+				forwardToReplica(portNum, packet);
+				double amount = Double.parseDouble(arguments.get(5));
 			}
 		}
-		else if (arguments[2].equalsIgnoreCase("withdraw")){
-			if (arguments[3].substring(2, 3).equals("C")){
-				// Execute customer withdraw -- to do!
-				String customerID = arguments[3];
+		else if (arguments.get(2).equalsIgnoreCase("withdraw")){
+			if (arguments.get(3).substring(2, 3).equals("C")){
+				String customerID = arguments.get(3);
 				String branchId = customerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
-				double amount = Double.parseDouble(arguments[4]);
+				forwardToReplica(portNum, packet);
+				double amount = Double.parseDouble(arguments.get(4));
 			}
-			else if (arguments[3].substring(2, 3).equals("M")){
-				// Execute manager withdraw -- to do!
-				String managerID = arguments[3];
-				String customerID = arguments[4];
+			else if (arguments.get(3).substring(2, 3).equals("M")){
+				String managerID = arguments.get(3);
+				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
-				double amount = Double.parseDouble(arguments[5]);
+				forwardToReplica(portNum, packet);
+				double amount = Double.parseDouble(arguments.get(5));
 			}
 		}
-		else if (arguments[2].equalsIgnoreCase("getBalance")){
-			if (arguments[3].substring(2, 3).equals("C")){
-				// Execute customer get balance -- to do!
-				String customerID = arguments[3];
+		else if (arguments.get(2).equalsIgnoreCase("getBalance")){
+			if (arguments.get(3).substring(2, 3).equals("C")){
+				String customerID = arguments.get(3);
 				String branchId = customerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
 				
 			}
-			else if (arguments[3].substring(2, 3).equals("M")){
-				// Execute manager get balance -- to do!
-				String managerID = arguments[3];
-				String customerID = arguments[4];
+			else if (arguments.get(3).substring(2, 3).equals("M")){
+				String managerID = arguments.get(3);
+				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
+				forwardToReplica(portNum, packet);
 			}
 		}
-		else if (arguments[2].equalsIgnoreCase("getAccountCount")){
-			// Execute get account count -- to do!
-			String managerID = arguments[3];
+		else if (arguments.get(2).equalsIgnoreCase("getAccountCount")){
+			String managerID = arguments.get(3);
 			String branchId = managerID.substring(0, 2);
 			int portNum = findReplica(status, branchId);
+			forwardToReplica(portNum, packet);
 		}
-		else if (arguments[2].equalsIgnoreCase("transferFund")){
-			if (arguments[3].substring(2, 3).equals("C")){
-				// Execute customer transfer fund -- to do!
-				String srcCustomerID = arguments[3];
-				double amount = Double.parseDouble(arguments[4]);
-				String destCustomerID = arguments[5];
+		else if (arguments.get(2).equalsIgnoreCase("transferFund")){
+			if (arguments.get(3).substring(2, 3).equals("C")){
+				String srcCustomerID = arguments.get(3);
+				double amount = Double.parseDouble(arguments.get(4));
+				String destCustomerID = arguments.get(5);
 				String branchId = destCustomerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
+				forwardToReplica(portNum, packet);
 			}
-			else if (arguments[3].substring(2, 3).equals("M")){
-				// Execute manager transfer fund -- to do!
-				String managerID = arguments[3];
-				String srcCustomerID = arguments[4];
-				double amount = Double.parseDouble(arguments[5]);
-				String destCustomerID = arguments[6];
+			else if (arguments.get(3).substring(2, 3).equals("M")){
+				String managerID = arguments.get(3);
+				String srcCustomerID = arguments.get(4);
+				double amount = Double.parseDouble(arguments.get(5));
+				String destCustomerID = arguments.get(6);
 				String branchId = destCustomerID.substring(0, 2);
 				int portNum = findReplica(status, branchId);
+				forwardToReplica(portNum, packet);
 			}
 		}
 	}
 	
+	/**
+	 * Maps the replicas' port numbers
+	 * @param status
+	 * @param initial
+	 * @return
+	 */
 	public static int findReplica(boolean status, String initial)
 	{
 		int portNum = 0;
@@ -294,6 +300,7 @@ public class ReplicaManager implements Runnable {
 	 * Receives sequencer requests and sends ACKs
 	 */
 	private void receiveRequests(){
+		
 		MulticastSocket msocket = null;
 		InetAddress group = null;
 		DatagramSocket socket = null;
@@ -301,14 +308,14 @@ public class ReplicaManager implements Runnable {
 		UDPSocketListener ul = null;
 		
 		try {
-<<<<<<< HEAD
-			receiveSequencer = new MulticastSocket(port);
-=======
-			ArrayList<DatagramPacket> incommingBuffer = new ArrayList<DatagramPacket>();
+			ArrayList<DatagramPacket> incomingBuffer = new ArrayList<DatagramPacket>();
+			ArrayList<DatagramPacket> deliveryBuffer = new ArrayList<DatagramPacket>();
+			
 			//Multicast Setup
 			msocket = new MulticastSocket(4000);
+			System.out.println("Testing requests to RM. Multicast Socket started.");
 			group = InetAddress.getByName("230.0.0.0");
-			ml = new MulticastListener(msocket, group, incommingBuffer);
+			ml = new MulticastListener(msocket, group, incomingBuffer);
 			ml.start();
 			
 			//Unicast Setup
@@ -316,51 +323,36 @@ public class ReplicaManager implements Runnable {
 			//ul = new UDPSocketListener(socket, incommingBuffer);
 			//ul.start();
 
-			//handle buffer
-			
-			
-			receiveSequencer = new DatagramSocket(port);
->>>>>>> 6e5d3318b76c258a502815d1046a9807af0b37e5
-			System.out.println("Testing requests to RM. Socket started.");
+			//handle incoming buffer
+			for (int i=0; i<incomingBuffer.size(); i++){
+				String req = new String(incomingBuffer.get(i).getData(), incomingBuffer.get(i).getOffset(), incomingBuffer.get(i).getLength());
+				ArrayList<String> args = parse(req);
+				int seqID = Integer.parseInt(args.get(0));
+				
+				// if sequence ID is smaller than last sequence ID received
+				if (seqID <= lastSequenceID){
+					incomingBuffer.remove(i);
+				} else {
+					// If next sequence is found in buffer, remove it from there and add to deliveryBuffer
+					if(seqID == lastSequenceID + 1 ){
+						deliveryBuffer.add(incomingBuffer.get(i));
+						lastSequenceID++;
+						incomingBuffer.remove(i);
+						handleRequest(deliveryBuffer.get(0));
+						//send acks to other RMs and execute sequence -- To do
+					}
+					else{
+						// send resend request to sequencer asking for next sequence (lastSequenceID+1)
+						// requestResend(lastSequenceID+1)
+					}
+				}
+			}
+		
+			/*
 			while (true) {
 				byte[] receiveData = new byte[1024];
 				byte[] sendData = new byte[1024];
 				ArrayList<String> arguments = null;
-				
-				DatagramPacket packet = new DatagramPacket(receiveData, receiveData.length);
-				receiveSequencer.receive(packet);
-				InetAddress group = InetAddress.getByName("230.0.0.0");
-				String request = new String(packet.getData(), packet.getOffset(), packet.getLength());
-				arguments = parse(request);
-				int sequenceID = Integer.parseInt(arguments.get(0));
-	
-				//holdBackBuffer.add(packet);
-				// Compare incoming request sequence ID with last sequence ID received
-				// Case if it is smaller or equal to the last sequence ID
-				if (sequenceID <= lastSequenceID){
-					// Ignore request
-				}
-				// Case if it is bigger than last sequence ID
-				else {
-					
-					// If it is bigger by 2 or more
-					if(sequenceID - lastSequenceID >= 2){
-					holdBackBuffer.add(packet);
-					}
-					else {
-						if(sequenceID == lastSequenceID +1){
-						deliveryBuffer.add(packet);
-						lastSequenceID++;
-						// Send ACKs to other RMs -- to do
-						}
-					}
-				}
-				
-				// Iterate through holdBackBuffer to see if the next sequence is stored in it
-				findNextSequence();
-			
-				
-				/*
 				String arguments[] = request.split(",");
 				int sequenceID = Integer.parseInt(arguments[0]);
 				
@@ -378,17 +370,18 @@ public class ReplicaManager implements Runnable {
 					DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getPort());
 					socket.send(sendPacket);
 				}
-				*/
+				
 			}
+			*/
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				ul.exit();
+				try {
+		//		ul.exit();
 				ml.exit();
-				ul.join();
+		//		ul.join();
 				ml.join();
-				socket.close();
+		//		socket.close();
 				msocket.close();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -413,29 +406,6 @@ public class ReplicaManager implements Runnable {
 		return arguments;
 	}
 	
-	/**
-	 * Iterate through holdBackBuffer to see if next sequence is stored in it
-	 * @return
-	 */
-	public void findNextSequence(){
-		for (int i=0; i<holdBackBuffer.size(); i++){
-			String req = new String(holdBackBuffer.get(i).getData(), holdBackBuffer.get(i).getOffset(), holdBackBuffer.get(i).getLength());
-			ArrayList<String> args = parse(req);
-			int seqID = Integer.parseInt(args.get(0));
-			
-			// If next sequence is found in holdBackBuffer, remove it from there and add to deliveryBuffer
-			if(seqID == lastSequenceID + 1 ){
-				deliveryBuffer.add(holdBackBuffer.get(i));
-				lastSequenceID++;
-				holdBackBuffer.remove(i);
-				//send acks to other RMs -- To do
-			}
-			else{
-				// send resend request to sequencer asking for next sequence (lastSequenceID+1)
-				// requestResend(lastSequenceID+1)
-			}
-		}
-	}
 	
 	@Override
 	public void run() {
