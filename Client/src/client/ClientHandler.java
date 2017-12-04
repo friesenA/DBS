@@ -177,7 +177,7 @@ public class ClientHandler {
 		}
 		
 		private static PrintWriter openLogStream(String customerID) {
-			String filename = "src/ClientLogs/" + customerID + "Log.txt";
+			String filename = "src/" + customerID + "Log.txt";
 			FileWriter fw = null;
 			BufferedWriter bw = null;
 			PrintWriter pw = null;

@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -23,7 +24,9 @@ public class Server {
 		HashMap<Character, ArrayList<Account>> records = new HashMap<Character, ArrayList<Account>>();
 		
 		String branch = args[0];
-		int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
+		int UDPserverPortNum = Integer.parseInt(args[1]);
+        String[] orbCommands = Arrays.copyOfRange(args, 2, args.length);
+		//int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
 
 		// Database Initialization steps
 		populateDefaultRecords(records, branch);
