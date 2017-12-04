@@ -1,0 +1,17 @@
+QCM1111
+Balance, QCM1111
+Deposit, QCM1111, 5000
+Balance, QCM1111
+Withdraw, QCM1111, 10000
+Balance,QCM1111
+exit
+QCM1121
+NewAccount, John, Doe, Montreal, 2229999, QC
+NewAccount, Jane, Doe, Montreal, 2229999, QC
+EditRecord, QCC1112, phone, 9998888
+EditRecord, QCC1112, address, Quebec
+EditRecofd, QCC1112, branch, Manitoba
+EditRecord, QCC1112, branch, MB 
+Balance, QCC1112
+exit
+q

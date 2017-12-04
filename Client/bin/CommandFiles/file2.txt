@@ -1,0 +1,29 @@
+QCC1122
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+QCC1123
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+QCC1124
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+QCC1125
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+q

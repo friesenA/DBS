@@ -1,0 +1,26 @@
+MBM1111
+Balance, QCM1131
+Withdraw, QCM1131, 5000
+Balance, QCM1131
+Balance, MBM1111
+Deposit, MBM1111, 5000
+Balance, MBM1111
+Balance, BCM1131
+Withdraw, BCM1131, 10000
+Balance, BCM1131
+exit
+MBM1121
+NewAccount, John, Doe, Montreal, 2229999, MB
+NewAccount, Jane, Doe, Montreal, 2229999, MB
+NewAccount, John, Doe, Montreal, 2229999, MB
+NewAccount, Jane, Doe, Montreal, 2229999, MB
+NewAccount, John, Doe, Montreal, 2229999, MB
+NewAccount, Jane, Doe, Montreal, 2229999, MB
+NewAccount, John, Doe, Montreal, 2229999, MB
+NewAccount, Jane, Doe, Montreal, 2229999, MB
+NewAccount, John, Doe, Montreal, 2229999, NB
+NewAccount, Jane, Doe, Montreal, 2229999, BC
+NewAccount, John, Doe, Montreal, 2229999, BC
+NewAccount, Jane, Doe, Montreal, 2229999, BC
+exit
+q

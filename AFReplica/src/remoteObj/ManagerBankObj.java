@@ -13,12 +13,9 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.AbstractMap.SimpleEntry;
 
-import javax.jws.WebService;
-
 import server.Account;
 import server.Branches;
 
-@WebService(endpointInterface="org.manager.webservice.ManagerBank")
 public class ManagerBankObj implements ManagerBank{
 	
 	private HashMap<Character, ArrayList<Account>> records;
@@ -49,7 +46,7 @@ public class ManagerBankObj implements ManagerBank{
 				
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -60,7 +57,7 @@ public class ManagerBankObj implements ManagerBank{
 		ArrayList<Account> list = (ArrayList<Account>) records.get(key);
 		list.add(a);
 		
-		message = "Success, the new account " + a.getCustomerID() +" has been added";
+		message = "Success, " + a.getCustomerID() +" account created";
 		log(header + message);
 		return message;
 	}
@@ -75,7 +72,7 @@ public class ManagerBankObj implements ManagerBank{
 				
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -83,7 +80,7 @@ public class ManagerBankObj implements ManagerBank{
 		//Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if(a == null){
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -102,21 +99,20 @@ public class ManagerBankObj implements ManagerBank{
 					   valid = true;
 			}
 			if(!valid){
-				message = "Failure, that is not a valid branch";
+				message = "Failure";
 				log(header + message);
 				return message;
 			}
 			
 			//Valid branch, change branch
 			a.changeBranch(newValue);
-			message = "Warning, changing branch makes the account unusable.";
 		}
 		else{
-			message = "Failure, that is not a valid field to alter";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
-		message = message + "Success, the field " + fieldName + " has been changed to " + newValue;
+		message = message + "Success";
 		log(header + message);
 		return message;
 	}
@@ -131,7 +127,7 @@ public class ManagerBankObj implements ManagerBank{
 		
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -139,7 +135,7 @@ public class ManagerBankObj implements ManagerBank{
 		//Send request to each server for the number of accounts
 		String answer = "";
 		for(int i=0; i < Branches.values().length; i++){
-			answer += sendUDPrequest("accountCount", UDPPortBase + i);
+			answer += sendUDPrequest("accountCountInternal", UDPPortBase + i);
 			answer += " ";
 		}
 		return answer;
@@ -155,7 +151,7 @@ public class ManagerBankObj implements ManagerBank{
 				
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -163,13 +159,13 @@ public class ManagerBankObj implements ManagerBank{
 		//Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if(a == null){
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 		
 		double newBalance = a.deposit(amt);
-		message = "Success, $"+ amt + " was added and the new balance is $" + newBalance;
+		message = "Success, the new balance is $" + newBalance;
 		log(header + message);
 		return message;
 	}
@@ -184,7 +180,7 @@ public class ManagerBankObj implements ManagerBank{
 
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -192,21 +188,21 @@ public class ManagerBankObj implements ManagerBank{
 		// Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if (a == null) {
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 		
 		SimpleEntry<Boolean, Double> result = a.withdraw(amt);
 		if (!result.getKey()) {
-			message = "Failure, insufficient funds to withdraw " + amt;
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
 		
 		//Do Withdrawl
 		double newBalance = result.getValue();
-		message = "Success, $" + amt + " was withdrawn and the new balance is $" + newBalance;
+		message = "Success, the new balance is $" + newBalance;
 		log(header + message);
 		return message;
 	}
@@ -221,7 +217,7 @@ public class ManagerBankObj implements ManagerBank{
 		
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -229,7 +225,7 @@ public class ManagerBankObj implements ManagerBank{
 		// Check that customerID exists and get account
 		Account a = this.findAccount(customerID);
 		if (a == null) {
-			message = "Failure, that customerID does not exist";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -251,7 +247,7 @@ public class ManagerBankObj implements ManagerBank{
 		
 		//Security Check
 		if(!validateManager(managerID)){
-			message = "Failure, invalid manager ID!";
+			message = "Failure";
 			log(header + message);
 			return message;
 		}
@@ -272,7 +268,7 @@ public class ManagerBankObj implements ManagerBank{
 			int portNum = UDPPortBase + Branches.valueOf(destinationCustomerID.substring(0, 2)).getValue();
 			
 			//send deposit request
-			String request = "transferFund," + destinationCustomerID + "," + amount; 
+			String request = "transferFundInternal," + destinationCustomerID + "," + amount; 
 			String answer = this.sendUDPrequest(request, portNum);
 			//validate success or failure
 			message += ", " + answer;
@@ -286,13 +282,13 @@ public class ManagerBankObj implements ManagerBank{
 				result = parse(answer);
 				//money return fails SHOULD NEVER HAPPEN!!!!!!!! Just here to catch an error in the system
 				if(result.get(0).equals("Failure")){
-					message += ", An error occured and the money could not be returned to the source";
+					message = "Failure";
 					log(header + message);
 					return message;
 				}
 				//money return successful
 				else{
-					message += ", Transaction could not be completed and the money was redeposited with the source";
+					message = "Failure";
 					log(header + message);
 					return message;
 				}
@@ -300,7 +296,7 @@ public class ManagerBankObj implements ManagerBank{
 			
 			//Successful Deposit to destination
 			else{
-				message += ", Transfer was a success";
+				message = "Success";
 				log(header + message);
 				return message;
 			}

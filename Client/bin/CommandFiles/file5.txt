@@ -1,0 +1,43 @@
+MBC1124
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+NBC1122
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+BCC1125
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+NBC1123
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+BCC1125
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+NBC1122
+Deposit, 100
+Deposit, 100
+Deposit, 100
+Withdraw, 1000
+Balance
+exit
+q
