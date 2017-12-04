@@ -11,26 +11,24 @@ import UDP.UDPSocketListener;
 
 public class ReplicaManager implements Runnable {
 	
-	private Process replica;
 	private int port;
 	private int sequencerPort;
-	private int replicaPort;
-	private String replicaPath; 
 	private boolean isRebooting = false;
-	private Thread VM;
 	int[] otherRMs;
 	MulticastSocket receiveSequencer = null;
 	private int lastSequenceID;
 	
-	private boolean status = true;  // TRUE = AMANDA, FALSE = BRANDON
+	private ProcessHandler replicaHandle;
 	
-	public ReplicaManager(int port, int replicaPort, int sequencerPort){//, int[] otherRMs, String replicaPath){
+	private boolean status;  // TRUE = AMANDA, FALSE = BRANDON
+	
+	public ReplicaManager(int port, int sequencerPort, String replicaPath, Boolean status){//, int[] otherRMs, String replicaPath){
 		this.port = port;
-		this.replicaPort = replicaPort;
-	//	this.replicaPath = replicaPath;
 		this.sequencerPort = sequencerPort;
 	//	this.otherRMs = otherRMs;
 		this.isRebooting = false;
+		this.status = status;
+		this.replicaHandle = new ProcessHandler(replicaPath, port, status);
 	}
 	
 	public int[] getRMPorts(){
@@ -53,102 +51,12 @@ public class ReplicaManager implements Runnable {
 		return this.port;
 	}
 	
-	public int getReplicaPort(){
-		return this.replicaPort;
-	}
-	
 	public boolean isRebooting(){
 		return isRebooting;
 	}
 	
 	public void setRebooting(boolean isRebooting){
 		this.isRebooting = isRebooting;
-	}
-
-	/**
-	 * Kill replica
-	 * @return
-	 */
-	public synchronized boolean killReplica(){
-		
-		try{
-			if(replica == null){
-			return true;
-			}
-			if(replica.isAlive()){
-				replica.destroy();
-				replica.waitFor();
-				resetVM();
-			}
-			return true;
-		}
-		catch(InterruptedException e){
-		}
-		return false;
-	}
-	
-	/**
-	 * Reboot replica
-	 * @return
-	 */
-	public synchronized boolean rebootReplica(){
-		try {
-			Runtime runtime = Runtime.getRuntime();
-			if(replica != null){
-				replica.destroy();
-				replica.waitFor();
-			}
-			replica = runtime.exec(replicaPath);
-			resetVM();
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		return false;
-	}
-	
-	/**
-	 * Initialize Replica
-	 */
-	
-	/*
-	private void initializeReplica(){		
-		try {
-			Runtime runtime = Runtime.getRuntime();
-			replica = runtime.exec(replicaPath);
-			resetVM();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	*/
-	
-	/**
-	 * Reset thread
-	 */
-	private void resetVM(){
-		Runtime runtime = Runtime.getRuntime();
-		if(VM != null){
-			runtime.removeShutdownHook(VM);
-		}
-	
-		VM = new Thread(() -> {
-			try{
-				if(replica != null){
-					replica.destroy();
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			finally {
-				replica = null;
-			}
-			});
-			
-		runtime.addShutdownHook(VM);
 	}
 	
 	/**
@@ -164,7 +72,7 @@ public class ReplicaManager implements Runnable {
 			if (arguments.get(3).substring(2, 3).equals("C")){
 				String customerID = arguments.get(3);
 				String branchId = customerID.substring(0,2);  // BRANCH ID QB,MB,NB,BC
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 				double amount = Double.parseDouble(arguments.get(4));
 			}
@@ -172,7 +80,7 @@ public class ReplicaManager implements Runnable {
 				String managerID = arguments.get(3);
 				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 				double amount = Double.parseDouble(arguments.get(5));
 			}
@@ -181,7 +89,7 @@ public class ReplicaManager implements Runnable {
 			if (arguments.get(3).substring(2, 3).equals("C")){
 				String customerID = arguments.get(3);
 				String branchId = customerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 				double amount = Double.parseDouble(arguments.get(4));
 			}
@@ -189,7 +97,7 @@ public class ReplicaManager implements Runnable {
 				String managerID = arguments.get(3);
 				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 				double amount = Double.parseDouble(arguments.get(5));
 			}
@@ -198,21 +106,21 @@ public class ReplicaManager implements Runnable {
 			if (arguments.get(3).substring(2, 3).equals("C")){
 				String customerID = arguments.get(3);
 				String branchId = customerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				
 			}
 			else if (arguments.get(3).substring(2, 3).equals("M")){
 				String managerID = arguments.get(3);
 				String customerID = arguments.get(4);
 				String branchId = customerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 			}
 		}
 		else if (arguments.get(2).equalsIgnoreCase("getAccountCount")){
 			String managerID = arguments.get(3);
 			String branchId = managerID.substring(0, 2);
-			int portNum = findReplica(status, branchId);
+			int portNum = findReplicaPort(branchId);
 			forwardToReplica(portNum, packet);
 		}
 		else if (arguments.get(2).equalsIgnoreCase("transferFund")){
@@ -221,7 +129,7 @@ public class ReplicaManager implements Runnable {
 				double amount = Double.parseDouble(arguments.get(4));
 				String destCustomerID = arguments.get(5);
 				String branchId = destCustomerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 			}
 			else if (arguments.get(3).substring(2, 3).equals("M")){
@@ -230,7 +138,7 @@ public class ReplicaManager implements Runnable {
 				double amount = Double.parseDouble(arguments.get(5));
 				String destCustomerID = arguments.get(6);
 				String branchId = destCustomerID.substring(0, 2);
-				int portNum = findReplica(status, branchId);
+				int portNum = findReplicaPort(branchId);
 				forwardToReplica(portNum, packet);
 			}
 		}
@@ -242,32 +150,32 @@ public class ReplicaManager implements Runnable {
 	 * @param initial
 	 * @return
 	 */
-	public static int findReplica(boolean status, String initial)
+	public int findReplicaPort(String initial)
 	{
-		int portNum = 0;
+		int portNum;
 		
 		if(status == true)  // For amanda implementation
 		{
 			if(initial.equalsIgnoreCase("bc") == true)  // bc = 1, mb = 2 nb = 3 qc = 4
 			{
-				portNum = 6501;
+				portNum = port + 1;
 			}
 			else if(initial.equalsIgnoreCase("mb"))
 			{
-				portNum = 6502;
+				portNum = port + 2;
 			}
 			else if(initial.equalsIgnoreCase("nb"))
 			{
-				portNum = 6503;
+				portNum = port + 3;
 			}
 			else
 			{
-				portNum = 6504;
+				portNum = port + 4;
 			}
 		}
 		else  // Brandon implementation
 		{
-			portNum = 6500;  // MAKE SURE THE PORT NUM IS EXACTLY LIKE BRANDON
+			portNum = port + 1;  // MAKE SURE THE PORT NUM IS EXACTLY LIKE BRANDON
 		}
 		
 		return portNum;
@@ -324,6 +232,7 @@ public class ReplicaManager implements Runnable {
 			//ul.start();
 
 			//handle incoming buffer
+			while(true){
 			for (int i=0; i<incomingBuffer.size(); i++){
 				String req = new String(incomingBuffer.get(i).getData(), incomingBuffer.get(i).getOffset(), incomingBuffer.get(i).getLength());
 				ArrayList<String> args = parse(req);
@@ -346,6 +255,7 @@ public class ReplicaManager implements Runnable {
 						// requestResend(lastSequenceID+1)
 					}
 				}
+			}
 			}
 		
 			/*
@@ -409,7 +319,8 @@ public class ReplicaManager implements Runnable {
 	
 	@Override
 	public void run() {
-//		initializeReplica();
+//		replicaHandle.initializeReplica();
 		receiveRequests();
+//		replicaHandle.killReplica();
 	}
 }
