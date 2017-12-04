@@ -99,7 +99,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 	// ------------------------------------------------------HELPER
 	// METHODS------------------------------------------------------------------------------//
 
-	// ---------------------------------------
+	//	---------------------------------------
 	// parse input string into arguments
 	// ----------------------------------------
 	private static ArrayList<String> parse(String command) {
@@ -130,7 +130,10 @@ public class ManagerBankObj extends ManagerBankPOA {
 
 			// modify message
 			Date d = new Date();
-			message = d.getTime() + "," + socket.getInetAddress().getHostAddress() + "," + socket.getPort() + "," + message;
+			message = socket.getPort() + "," + message;
+			InetAddress a = socket.getInetAddress();
+			message = "localhost," + message;
+			message = System.currentTimeMillis() + "," + message;
 
 			// send request
 			byte[] m = message.getBytes();

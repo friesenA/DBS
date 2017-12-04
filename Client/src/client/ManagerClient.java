@@ -163,7 +163,7 @@ public class ManagerClient extends Client{
 	//---------------------------------------------------------CORBA-HELPER------------------------------------------------------------------------//
 
 	private ManagerBank getManagerBankObj(String branch) throws Exception{
-		String objname = branch + "mb";
+		String objname = "mb";
 		ManagerBank obj = null;
 		
 		// Setup CORBA ORB access

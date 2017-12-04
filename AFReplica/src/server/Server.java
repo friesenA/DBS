@@ -24,8 +24,6 @@ public class Server {
 		HashMap<Character, ArrayList<Account>> records = new HashMap<Character, ArrayList<Account>>();
 		
 		String branch = args[0];
-		int UDPserverPortNum = Integer.parseInt(args[1]);
-        String[] orbCommands = Arrays.copyOfRange(args, 2, args.length);
 		//int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
 
 		// Database Initialization steps

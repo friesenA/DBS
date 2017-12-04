@@ -113,7 +113,7 @@ public class CustomerClient extends Client {
 	// ---------------------------------------------------------CORBA-HELPER------------------------------------------------------------------------//
 
 	private CustomerBank getCustomerBankObj(String branch) throws Exception {
-		String objname = branch + "cb";
+		String objname = "cb";
 		CustomerBank obj = null;
 		
 		// Setup CORBA ORB access

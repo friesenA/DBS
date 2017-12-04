@@ -35,29 +35,24 @@ public class FrontEnd {
 			org.omg.CORBA.Object MBref = rootpoa.servant_to_reference(MBobj);
 			CustomerBank javaCBref = CustomerBankHelper.narrow(CBref);
 			ManagerBank javaMBref = ManagerBankHelper.narrow(MBref);
-			
-			//get name service reference
+
+			// get name service reference
 			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-			
-			//bind objects to naming service
+
+			// bind objects to naming service
 			NameComponent CBpath[] = ncRef.to_name("cb");
 			NameComponent MBpath[] = ncRef.to_name("mb");
 			ncRef.rebind(CBpath, javaCBref);
 			ncRef.rebind(MBpath, javaMBref);
 
 			System.out.println("Front End CORBA server ready ...");
-			
+
 			// Start the ORB in a new thread
-			new Thread(new Runnable() {
-				public void run() {
-					while (true) {
-						orb.run();
-					}
-				}
-			}).start();
-		}
-		catch (Exception e) {
+			while (true) {
+				orb.run();
+			}
+		} catch (Exception e) {
 			System.err.println("ERROR: " + e);
 			e.printStackTrace(System.out);
 		}
