@@ -1,8 +1,10 @@
 package server;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -81,7 +83,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 		}
 		return arguments;
 	}
-	
+
 	// -------------------------------------------
 	// Send/Receive UDP communications
 	// -------------------------------------------
@@ -104,11 +106,13 @@ public class CustomerBankObj extends CustomerBankPOA {
 			request = new DatagramPacket(m, m.length, host, portNum);
 			ArrayList<DatagramPacket> packetBuffer = new ArrayList<DatagramPacket>();
 			ArrayList<String> responses = new ArrayList<String>();
+			ArrayList<Integer> portNums = new ArrayList<Integer>();
+			ArrayList<InetAddress> addrs = new ArrayList<InetAddress>();
 			
 			listener = new UDPSocketListener(socket, packetBuffer, request);
 			
 			socket.send(request);
-			listener.run();
+			listener.start();
 
 			long start = System.currentTimeMillis();
 			boolean sequencerTimeout = true;
@@ -120,12 +124,13 @@ public class CustomerBankObj extends CustomerBankPOA {
 					System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
 					String response = (new String(in));
 					// parse String into arguments
-					ArrayList<String> arguments = parse(answer);
+					ArrayList<String> arguments = parse(response);
 					if (arguments.get(0).equals("Success") || arguments.get(0).equals("Failure")) {
 						// record source
 						responses.add(response);
+						portNums.add(packetBuffer.get(0).getPort());
+						addrs.add(packetBuffer.get(0).getAddress());
 						packetBuffer.remove(0);
-						System.out.println("Got a result");
 					}
 					else if (arguments.get(1).equals("received")){
 						sequencerTimeout = false;
@@ -146,10 +151,27 @@ public class CustomerBankObj extends CustomerBankPOA {
 						byte[] in = new byte[packetBuffer.get(0).getLength()];
 						System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
 						responses.add(new String(in));
+						portNums.add(packetBuffer.get(0).getPort());
+						addrs.add(packetBuffer.get(0).getAddress());
 						packetBuffer.remove(0);
 					}
 					else{
-						//handle crash
+						//find crashed Replica, by finding omitted port
+						int i,j;
+						for(i = 0; i < responses.size(); i++){
+							boolean flag = false;
+							int RMportNum = 7000+i*100;
+							for(j = 0; j < responses.size(); i++){
+								int messageRMportNum = (portNums.get(j)/10) * 10;
+								if(RMportNum == messageRMportNum){
+									flag = true;
+								}
+							}
+							if(flag == false){
+								break;
+							}
+						}
+						handleCrash(7000+i*100);
 					}
 					
 					// Analyze for correctness
@@ -167,9 +189,10 @@ public class CustomerBankObj extends CustomerBankPOA {
 							answer = responses.get(i);
 						}
 						if(error[i] >= 2){
-							//handle byzantine at i
+							handleByzantine(addrs.get(i), portNums.get(i));
 						}
 					}
+					break;
 				}	
 			}
 		} catch (Exception e) {
@@ -185,6 +208,120 @@ public class CustomerBankObj extends CustomerBankPOA {
 			}
 		}
 		return answer;
+	}
+	
+	// -------------------------------------------
+	// Handle Crash Failure
+	// -------------------------------------------
+	
+	private void handleCrash(int portNum){
+		String message = "Confirm crash, " + "localhost" + "," + portNum;
+		//Get replica Manager's port number
+		int RMportNum = (portNum/10) * 10;
+		
+		DatagramSocket socket = null;
+		DatagramPacket request = null;
+		UDPSocketListener listener = null;
+		try {
+			socket = new DatagramSocket();
+			InetAddress host = InetAddress.getByName("localhost");
+
+			// send request to confirm crash
+			byte[] m = message.getBytes();
+			for(int i = 0; i < 4; i++){
+				request = new DatagramPacket(m, m.length, host, 7000+i*100);
+				socket.send(request);
+			}
+			ArrayList<DatagramPacket> packetBuffer = new ArrayList<DatagramPacket>();
+			listener = new UDPSocketListener(socket, packetBuffer, request);
+			listener.start();
+			
+			//Check responses from all RMs
+			int negativeResponses = 0;
+			int expectedResponses = 4;
+			while (negativeResponses < expectedResponses) {
+				if(!packetBuffer.isEmpty()){
+					byte[] in = new byte[packetBuffer.get(0).getLength()];
+					System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
+					String answer = (new String(in));
+					// parse String into arguments
+					ArrayList<String> arguments = parse(answer);
+					if (arguments.get(0).equals("Yes")){
+						break;
+					}
+					else if (arguments.get(0).equals("No")){
+						negativeResponses++;
+					}
+				}
+			}
+			
+			//If no affirmative responses then try to recover
+			if(negativeResponses == 4){
+				message = "recover";
+				m = message.getBytes();
+				request = new DatagramPacket(m, m.length, host, RMportNum);
+				socket.send(request);
+			}
+			
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	// -------------------------------------------
+	// Handle Byzantine Failure
+	// -------------------------------------------
+	
+	private void handleByzantine(InetAddress addr, int portNum){
+		//Get replica Manager's port number
+		int RMportNum = (portNum/10) * 10;
+		String message = "Error check";
+		
+		DatagramSocket socket = null;
+		DatagramPacket request = null;
+		try {
+			socket = new DatagramSocket();
+			InetAddress host = InetAddress.getByName("localhost");
+
+			// send request for error information
+			byte[] m = message.getBytes();
+			request = new DatagramPacket(m, m.length, host, RMportNum);
+			socket.send(request);
+			
+			//recieve response
+			byte[] buffer = new byte[1000];
+			DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+			socket.receive(response);
+			
+			//Unmarshall
+			byte[] in = new byte[response.getLength()];
+			System.arraycopy(response.getData(), response.getOffset(), in, 0, response.getLength());
+			String answer = (new String(in));
+			// parse String into arguments
+			int ans = Integer.parseInt(answer);
+
+			//Analyze response and craft update
+			if (ans < 2){
+				message = "" + ans+1;
+			}
+			else{
+				message = "recover";
+			}
+			//send update
+			m = message.getBytes();
+			request = new DatagramPacket(m, m.length, host, RMportNum);
+			socket.send(request);
+			
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	// --------------------------------------------------------------CORBA-METHODS----------------------------------------------------------------//
