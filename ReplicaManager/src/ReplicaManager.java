@@ -16,7 +16,7 @@ public class ReplicaManager implements Runnable {
 	private boolean isRebooting = false;
 	int[] otherRMs;
 	MulticastSocket receiveSequencer = null;
-	private int lastSequenceID;
+	private int lastSequenceID = 999;
 	
 	private ProcessHandler replicaHandle;
 	
@@ -150,8 +150,7 @@ public class ReplicaManager implements Runnable {
 		
 		try {
 			ArrayList<DatagramPacket> incomingBuffer = new ArrayList<DatagramPacket>();
-			ArrayList<DatagramPacket> deliveryBuffer = new ArrayList<DatagramPacket>();
-			
+	
 			//Multicast Setup
 			msocket = new MulticastSocket(4000);
 			System.out.println("Testing requests to RM. Multicast Socket started.");
@@ -177,10 +176,11 @@ public class ReplicaManager implements Runnable {
 				} else {
 					// If next sequence is found in buffer, remove it from there and add to deliveryBuffer
 					if(seqID == lastSequenceID + 1 ){
-						deliveryBuffer.add(incomingBuffer.get(i));
+		
 						lastSequenceID++;
-						incomingBuffer.remove(i);
 						handleRequest(incomingBuffer.get(i));
+						incomingBuffer.remove(i);
+						
 						//send acks to other RMs and execute sequence -- To do
 					}
 					else{
