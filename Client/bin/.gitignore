@@ -4,6 +4,11 @@
 /client/
 /QCM1111Log.txt
 /ClientLogs/
+<<<<<<< HEAD
 /QCC1234Log.txt
 /QCM1298Log.txt
 /QCC1298Log.txt
+=======
+/QCC1111Log.txt
+/QCC1112Log.txt
+>>>>>>> 5b63a4e10dbf0c07aba2a735a801ce341a58c385
