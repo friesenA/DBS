@@ -71,6 +71,7 @@ public class ReplicaManager implements Runnable {
 		String ID = arguments.get(3);
 		String branchId = ID.substring(0,2);  // BRANCH ID QB,MB,NB,BC
 		int portNum = findReplicaPort(branchId);
+		System.out.println("Forwarding packet to "+ portNum);
 		forwardToReplica(portNum, packet);
 	}
 		

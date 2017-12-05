@@ -125,6 +125,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 						// record source
 						responses.add(response);
 						packetBuffer.remove(0);
+						System.out.println("Got a result");
 					}
 					else if (arguments.get(1).equals("received")){
 						sequencerTimeout = false;
