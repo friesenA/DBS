@@ -198,7 +198,7 @@ public class BankImpl{
 					bw.flush();
 					bw.close();
 					
-					return record.getBalance();
+					return "Success, the balance is $" + record.getBalance().toString();
 				}
 			}
 		}
