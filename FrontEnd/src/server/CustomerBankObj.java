@@ -119,6 +119,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 			long replicaTimeout;
 			while (true) {
 				//Check received packet buffer 
+				synchronized(this){
 				if(!packetBuffer.isEmpty()){
 					byte[] in = new byte[packetBuffer.get(0).getLength()];
 					System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
@@ -171,7 +172,7 @@ public class CustomerBankObj extends CustomerBankPOA {
 								break;
 							}
 						}
-						handleCrash(7000+i*100);
+						//handleCrash(7000+i*100);
 					}
 					
 					// Analyze for correctness
@@ -189,11 +190,12 @@ public class CustomerBankObj extends CustomerBankPOA {
 							answer = responses.get(i);
 						}
 						if(error[i] >= 2){
-							handleByzantine(addrs.get(i), portNums.get(i));
+							//handleByzantine(addrs.get(i), portNums.get(i));
 						}
 					}
 					break;
 				}	
+			}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

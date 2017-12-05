@@ -8,9 +8,9 @@ public class Customer {
 	private String address;
 	private String phone;
 	private String branch;
-	private String balance;
+	private double balance;
 	
-	public Customer(String custId, String fname, String lname, String custAddress, String custPhone, String custBranch, String custBalance)
+	public Customer(String custId, String fname, String lname, String custAddress, String custPhone, String custBranch, double custBalance)
 	{
 		customerId = custId;
 		firstName = fname;
@@ -83,12 +83,12 @@ public class Customer {
 		return branch;
 	}
 	
-	public void setBalance(String custBalance)
+	public void setBalance(double custBalance)
 	{
 		balance = custBalance;
 	}
 	
-	public String getBalance()
+	public double getBalance()
 	{
 		return balance;
 	}

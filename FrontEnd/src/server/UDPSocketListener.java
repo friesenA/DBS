@@ -35,7 +35,10 @@ public class UDPSocketListener extends Thread {
 				socket.setSoTimeout(1000);
 				socket.receive(response);
 				
+				synchronized(this){
 				this.packetBuffer.add(response);
+				}
+				
 				buffer = new byte[1000];
 				response = new DatagramPacket(buffer, buffer.length);
 			} catch (SocketTimeoutException e) {

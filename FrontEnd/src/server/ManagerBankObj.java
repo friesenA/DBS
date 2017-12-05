@@ -152,6 +152,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 			long replicaTimeout;
 			while (true) {
 				//Check received packet buffer 
+				synchronized(this){
 				if(!packetBuffer.isEmpty()){
 					byte[] in = new byte[packetBuffer.get(0).getLength()];
 					System.arraycopy(packetBuffer.get(0).getData(), packetBuffer.get(0).getOffset(), in, 0, packetBuffer.get(0).getLength());
@@ -227,6 +228,7 @@ public class ManagerBankObj extends ManagerBankPOA {
 					}
 					break;
 				}	
+			}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -80,10 +80,10 @@ public class BankImpl{
 				    FileWriter fw = new FileWriter(file, true);
 				    BufferedWriter bw = new BufferedWriter(fw);
 					
-					double oldBalance = Double.parseDouble(record.getBalance());
+					double oldBalance = record.getBalance();
 					double newBalance = oldBalance + amount; 
 					
-					record.setBalance(Double.toString(newBalance));
+					record.setBalance(newBalance);
 					customerRecords.set(x, record);
 					me.setValue(customerRecords);
 					
@@ -134,12 +134,12 @@ public class BankImpl{
 					FileWriter fw = new FileWriter(file, true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					
-					double oldAmount = Double.parseDouble(record.getBalance());
+					double oldAmount = record.getBalance();
 					double newAmount = oldAmount - amount;
 					
 					if(newAmount >= 0)
 					{
-						record.setBalance(Double.toString(newAmount));
+						record.setBalance(newAmount);
 						customerRecords.set(x, record);
 						me.setValue(customerRecords);
 						
@@ -198,7 +198,7 @@ public class BankImpl{
 					bw.flush();
 					bw.close();
 					
-					return "Success, the balance is $" + record.getBalance().toString();
+					return "Success, the balance is $" + record.getBalance();
 				}
 			}
 		}
@@ -211,7 +211,7 @@ public class BankImpl{
 	
 	
 	// HANDLES CREATING CUSTOMER ACCOUNT
-	public synchronized String createAccountRecord(String custId, String fname, String lname, String custAddress, String custPhone, String custBranch, String custBalance) throws Exception
+	public synchronized String createAccountRecord(String custId, String fname, String lname, String custAddress, String custPhone, String custBranch, double custBalance) throws Exception
 	{
 		//String path = getBankRecords(custId);
 		//database = getDatabase(path);
@@ -430,7 +430,7 @@ public class BankImpl{
 				char lastNameChar = fieldNames[2].toString().charAt(0);
 				totalCustAmt++;
 				
-				customer = new Customer(fieldNames[0], fieldNames[1], fieldNames[2], fieldNames[3], fieldNames[4], fieldNames[5], fieldNames[6]);
+				customer = new Customer(fieldNames[0], fieldNames[1], fieldNames[2], fieldNames[3], fieldNames[4], fieldNames[5], Double.parseDouble(fieldNames[6]));
 				
 				if(database.containsKey(Character.toString(lastNameChar)))
 				{
@@ -457,7 +457,7 @@ public class BankImpl{
 	
 	public void updateDatabase(String file) throws IOException
 	{
-		File createFile = new File(file);
+	/*	File createFile = new File(file);
 		createFile.createNewFile();
 		FileWriter fw = new FileWriter(file);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -480,7 +480,7 @@ public class BankImpl{
 		}
 		
 		bw.flush();
-		bw.close();
+		bw.close(); */
 	}
 	
 	
@@ -514,12 +514,12 @@ public class BankImpl{
 					FileWriter fw = new FileWriter(file, true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					
-					double oldAmount = Double.parseDouble(record.getBalance());
+					double oldAmount = record.getBalance();
 					double newAmount = oldAmount - amount;
 					
 					if(newAmount >= 0)
 					{
-						record.setBalance(Double.toString(newAmount));
+						record.setBalance(newAmount);
 						customerRecords.set(x, record);
 						me.setValue(customerRecords);
 						
@@ -539,9 +539,9 @@ public class BankImpl{
 								
 								if(record2.getCustomerId().toString().equalsIgnoreCase(destinationId))
 								{
-									double oldAmount2 = Double.parseDouble(record2.getBalance());
+									double oldAmount2 = record2.getBalance();
 									double newAmount2 = oldAmount2 + amount;
-									record2.setBalance(Double.toString(newAmount2));
+									record2.setBalance(newAmount2);
 									customerRecords.set(z, record2);
 									me.setValue(customerRecords);
 									return "Transfer fund successful";

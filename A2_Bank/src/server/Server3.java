@@ -138,7 +138,7 @@ public class Server3 {
 			{
 				bankBranch = getBranch(transferMsg[4]);  // must fill it with the branch initial
 				getParameters(sentence);
-				replyMsg = bankBranch.createAccountRecord(arrParameters.get(0), arrParameters.get(1), arrParameters.get(2), arrParameters.get(3), arrParameters.get(4), arrParameters.get(5), arrParameters.get(6));
+				replyMsg = bankBranch.createAccountRecord(arrParameters.get(0), arrParameters.get(1), arrParameters.get(2), arrParameters.get(3), arrParameters.get(4), arrParameters.get(5), Double.parseDouble(arrParameters.get(6)));
 			}
 			else if(transferMsg[3].equalsIgnoreCase("editRecord"))
 			{

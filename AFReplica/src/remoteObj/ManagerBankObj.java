@@ -165,7 +165,7 @@ public class ManagerBankObj implements ManagerBank{
 		}
 		
 		double newBalance = a.deposit(amt);
-		message = "Success, the new balance is $" + newBalance;
+		message = "Success, the new balance $" + newBalance;
 		log(header + message);
 		return message;
 	}
@@ -202,7 +202,7 @@ public class ManagerBankObj implements ManagerBank{
 		
 		//Do Withdrawl
 		double newBalance = result.getValue();
-		message = "Success, the new balance is $" + newBalance;
+		message = "Success, the new balance $" + newBalance;
 		log(header + message);
 		return message;
 	}

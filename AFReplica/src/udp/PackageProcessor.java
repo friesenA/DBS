@@ -19,7 +19,8 @@ public class PackageProcessor extends Thread {
 	HashMap<Character, ArrayList<Account>> customerRecords;
 	String branch;
 
-	public PackageProcessor(DatagramPacket packet, HashMap<Character, ArrayList<Account>> customerRecords, String branch) {
+	public PackageProcessor(DatagramPacket packet, HashMap<Character, ArrayList<Account>> customerRecords,
+			String branch) {
 		this.packet = packet;
 		this.customerRecords = customerRecords;
 		this.branch = branch;
@@ -29,116 +30,115 @@ public class PackageProcessor extends Thread {
 		DatagramSocket socket = null;
 		try {
 			socket = new DatagramSocket();
-			
-			//Unmarshall
+
+			// Unmarshall
 			byte[] in = new byte[packet.getLength()];
 			System.arraycopy(packet.getData(), packet.getOffset(), in, 0, packet.getLength());
 			// parse String into arguments
 			ArrayList<String> arguments = parse(new String(in));
-			
-			//********************************REMOTE*METHODCALL********************************************************//
-			//Deposit
-			if (arguments.get(3).equals("deposit")){
-				String message = "";
-				if(arguments.size() == 6){
-					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(5)).doubleValue());
-					message = c.deposit(arguments.get(4), amount);
+
+			// ********************************REMOTE*METHODCALL********************************************************//
+			// Check branch is accurate
+			if (arguments.size() >= 4 && arguments.get(4).substring(0, 2).equals(branch)) {
+				// Deposit
+				if (arguments.get(3).equals("deposit")) {
+					String message = "";
+					if (arguments.size() == 6) {
+						CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(5)).doubleValue());
+						message = c.deposit(arguments.get(4), amount);
+					} else if (arguments.size() == 7) {
+						ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(6)).doubleValue());
+						message = m.deposit(arguments.get(4), arguments.get(5), amount);
+					}
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
 				}
-				else if (arguments.size() == 7){
+				// Withdraw
+				else if (arguments.get(3).equals("withdraw")) {
+					String message = "";
+					if (arguments.size() == 6) {
+						CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(5)).doubleValue());
+						message = c.withdraw(arguments.get(4), amount);
+					} else if (arguments.size() == 7) {
+						ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(6)).doubleValue());
+						message = m.withdraw(arguments.get(4), arguments.get(5), amount);
+					}
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
+				}
+				// GetBalance
+				else if (arguments.get(3).equals("getBalance")) {
+					String message = "";
+					if (arguments.size() == 5) {
+						CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
+						message = c.getBalance(arguments.get(4));
+					} else if (arguments.size() == 6) {
+						ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+						message = m.getBalance(arguments.get(4), arguments.get(5));
+					}
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
+				}
+				// TransferFund
+				else if (arguments.get(3).equals("transferFund")) {
+					String message = "";
+					if (arguments.size() == 7) {
+						CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(5)).doubleValue());
+						message = c.transferFund(arguments.get(4), amount, arguments.get(6));
+					} else if (arguments.size() == 8) {
+						ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
+						double amount = (new Double(arguments.get(6)).doubleValue());
+						message = m.transferFund(arguments.get(4), arguments.get(5), amount, arguments.get(7));
+					}
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
+				}
+				// CreateAccountRecord
+				else if (arguments.get(3).equals("createAccountRecord")) {
+					String message = "";
 					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(6)).doubleValue());
-					message = m.deposit(arguments.get(4), arguments.get(5), amount);
+					message = m.createAccountRecord(arguments.get(4), arguments.get(5), arguments.get(6),
+							arguments.get(7), arguments.get(8), arguments.get(9));
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
 				}
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			//Withdraw
-			else if(arguments.get(3).equals("withdraw")){
-				String message = "";
-				if(arguments.size() == 6){
-					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(5)).doubleValue());
-					message = c.withdraw(arguments.get(4), amount);
-				}
-				else if (arguments.size() == 7){
+				// EditRecord
+				else if (arguments.get(3).equals("editRecord")) {
+					String message = "";
 					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(6)).doubleValue());
-					message = m.withdraw(arguments.get(4), arguments.get(5), amount);
+					message = m.editRecord(arguments.get(4), arguments.get(5), arguments.get(6), arguments.get(7));
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
 				}
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			//GetBalance
-			else if(arguments.get(3).equals("getBalance")){
-				String message = "";
-				if(arguments.size() == 5){
-					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
-					message = c.getBalance(arguments.get(4));
-				}
-				else if (arguments.size() == 6){
+				// AccountCount
+				else if (arguments.get(3).equals("getAccountCount")) {
+					String message = "";
 					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-					message = m.getBalance(arguments.get(4), arguments.get(5));
+					message = m.getAccountCount(arguments.get(4));
+
+					InetAddress a = InetAddress.getByName(arguments.get(1));
+					int p = Integer.parseInt(arguments.get(2));
+					sendReply(message, a, p);
 				}
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
 			}
-			//TransferFund
-			else if(arguments.get(3).equals("transferFund")){
-				String message = "";
-				if(arguments.size() == 7){
-					CustomerBankObj c = new CustomerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(5)).doubleValue());
-					message = c.transferFund(arguments.get(4), amount, arguments.get(6));
-				}
-				else if (arguments.size() == 8){
-					ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-					double amount = (new Double(arguments.get(6)).doubleValue());
-					message = m.transferFund(arguments.get(4), arguments.get(5), amount, arguments.get(7));
-				}
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			//CreateAccountRecord
-			else if(arguments.get(3).equals("createAccountRecord")){
-				String message = "";
-				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-				message = m.createAccountRecord(arguments.get(4), arguments.get(5), arguments.get(6), arguments.get(7), arguments.get(8), arguments.get(9));
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			//EditRecord
-			else if(arguments.get(3).equals("editRecord")){
-				String message = "";
-				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-				message = m.editRecord(arguments.get(4), arguments.get(5), arguments.get(6), arguments.get(7));
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			//AccountCount
-			else if(arguments.get(3).equals("getAccountCount")){
-				String message = "";
-				ManagerBankObj m = new ManagerBankObj(customerRecords, this.branch);
-				message = m.getAccountCount(arguments.get(4));
-				
-				InetAddress a = InetAddress.getByName(arguments.get(1));
-				int p = Integer.parseInt(arguments.get(2));
-				sendReply(message, a, p);
-			}
-			
-			//*****************************INTERNAL*METHODCALL**********************************************************//
+			// *****************************INTERNAL*METHODCALL**********************************************************//
 			// Count Accounts internal to Replica
 			else if ((new String(in)).equals("accountCountInternal")) {
 				// find number of records
@@ -146,7 +146,8 @@ public class PackageProcessor extends Thread {
 				// package numRecords and branch name
 				String pair = ", " + this.branch + " " + numRecords;
 				byte[] message = pair.getBytes();
-				DatagramPacket reply = new DatagramPacket(message, pair.length(), packet.getAddress(), packet.getPort());
+				DatagramPacket reply = new DatagramPacket(message, pair.length(), packet.getAddress(),
+						packet.getPort());
 				socket.send(reply);
 				System.out.println("Response sent.");
 			}
@@ -169,35 +170,33 @@ public class PackageProcessor extends Thread {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (socket != null)
 				socket.close();
 		}
 	}
-	
-	//---------------------------------------
+
+	// ---------------------------------------
 	// Send Reply
-	//---------------------------------------
-	private static void sendReply(String message, InetAddress addr, int port){
+	// ---------------------------------------
+	private static void sendReply(String message, InetAddress addr, int port) {
 		DatagramSocket socket = null;
 		try {
 			socket = new DatagramSocket();
 			byte[] m = message.getBytes();
 			DatagramPacket reply = new DatagramPacket(m, message.length(), addr, port);
 			socket.send(reply);
-			
+
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (socket != null)
 				socket.close();
 		}
 	}
-	
+
 	// ---------------------------------------
 	// parse input string into arguments
 	// ----------------------------------------

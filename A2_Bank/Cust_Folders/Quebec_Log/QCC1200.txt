@@ -1,3 +1,37 @@
 User retrieved account balance, total balance: $5600.0
 Successfully deposit $300.0, total balance: $5900.0
 User retrieved account balance, total balance: $5900.0
+User retrieved account balance, total balance: $5900.0
+User retrieved account balance, total balance: $5900.0
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+Successfully deposit $300.0, total balance: $5900.0
+Successfully deposit $300.0, total balance: $5900.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+User retrieved account balance, total balance: $5600.0
+Successfully deposit $300.0, total balance: $5900.0
+Successfully deposit $300.0, total balance: $5900.0
+User retrieved account balance, total balance: $5900.0
+User retrieved account balance, total balance: $5900.0
+Successfully deposit $300.0, total balance: $6200.0
+Successfully deposit $300.0, total balance: $6200.0

@@ -24,8 +24,7 @@ public class Server {
 		HashMap<Character, ArrayList<Account>> records = new HashMap<Character, ArrayList<Account>>();
 
 		String branch = args[0];
-		// int UDPserverPortNum = UDPPortBase +
-		// Branches.valueOf(branch).getValue();
+		// int UDPserverPortNum = UDPPortBase + Branches.valueOf(branch).getValue();
 
 		// Database Initialization steps
 		populateDefaultRecords(records, branch);
@@ -98,10 +97,11 @@ public class Server {
 		FileReader fr = null;
 		BufferedReader in = null;
 		try {
-			fr = new FileReader("src/server/initialRecords.txt");
+			fr = new FileReader("src/server/"+branch+"AccountsList.txt");
+			//fr = new FileReader("scr/server/initialRecords.txt");
 			in = new BufferedReader(fr);
 
-			// read line by line and add to records
+			/* read line by line and add to records
 			String line;
 			while ((line = in.readLine()) != null) {
 				ArrayList<String> arguments = parse(line);
@@ -109,6 +109,16 @@ public class Server {
 				records.get(arguments.get(1).toUpperCase().charAt(0)).add(new Account(arguments.get(0),
 						arguments.get(1), arguments.get(2), arguments.get(3), 5000, branch, arguments.get(4)));
 			}
+			*/
+			
+			String line;
+			while ((line = in.readLine()) != null) {
+				ArrayList<String> arguments = parse(line);
+				// Create account and place it in the correct list.
+				records.get(arguments.get(2).toUpperCase().charAt(0)).add(new Account(arguments.get(0),
+						arguments.get(1), arguments.get(2), arguments.get(3), arguments.get(4), arguments.get(6)));
+			}
+			
 			fr.close();
 			in.close();
 		} catch (Exception e) {

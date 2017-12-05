@@ -23,6 +23,15 @@ public class Account {
 		uniquedigit++;
 	}
 	
+	public Account(String id, String fn, String ln, String address, String phone, String balance){
+		this.customerID = id;
+		this.firstName = fn;
+		this.lastName = ln;
+		this.address = address;
+		this.phone = phone;
+		this.balance = Double.parseDouble(balance);
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}

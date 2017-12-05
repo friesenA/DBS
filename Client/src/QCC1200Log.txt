@@ -1,0 +1,4 @@
+2017-12-05 11:18:53: balance - 
+2017-12-05 11:38:48: balance - Success, the balance is $5600.0
+2017-12-05 11:46:00: balance - Success, the balance is $5600.0
+2017-12-05 11:48:35: balance - Success, the balance is $5900.0
