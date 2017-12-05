@@ -166,27 +166,27 @@ public class ReplicaManager implements Runnable {
 
 			//handle incoming buffer
 			while(true){
-			for (int i=0; i<incomingBuffer.size(); i++){
-				String req = new String(incomingBuffer.get(i).getData(), incomingBuffer.get(i).getOffset(), incomingBuffer.get(i).getLength());
-				ArrayList<String> args = parse(req);
-				int seqID = Integer.parseInt(args.get(0));
+				for (int i=0; i<incomingBuffer.size(); i++){
+					String req = new String(incomingBuffer.get(i).getData(), incomingBuffer.get(i).getOffset(), incomingBuffer.get(i).getLength());
+					ArrayList<String> args = parse(req);
+					int seqID = Integer.parseInt(args.get(0));
 				
-				// if sequence ID is smaller than last sequence ID received
-				if (seqID <= lastSequenceID){
-					incomingBuffer.remove(i);
-				} else {
-					// If next sequence is found in buffer, remove it from there and add to deliveryBuffer
-					if(seqID == lastSequenceID + 1 ){
-		
-						lastSequenceID++;
-						handleRequest(incomingBuffer.get(i));
+					// if sequence ID is smaller than last sequence ID received
+					if (seqID <= lastSequenceID){
 						incomingBuffer.remove(i);
-						
-						//send acks to other RMs and execute sequence -- To do
-					}
-					else{
-						// send resend request to sequencer asking for next sequence (lastSequenceID+1)
-						// requestResend(lastSequenceID+1)
+					} else {
+						// If next sequence is found in buffer, remove it from there and add to deliveryBuffer
+						if(seqID == lastSequenceID + 1 ){
+			
+							lastSequenceID++;
+							handleRequest(incomingBuffer.get(i));
+							incomingBuffer.remove(i);
+							
+							//send acks to other RMs and execute sequence -- To do
+						}
+						else{
+							// send resend request to sequencer asking for next sequence (lastSequenceID+1)
+							// requestResend(lastSequenceID+1)
 					}
 				}
 			}
@@ -255,6 +255,6 @@ public class ReplicaManager implements Runnable {
 	public void run() {
 		replicaHandle.initializeReplica();
 		receiveRequests();
-		replicaHandle.killReplica();
+	//	replicaHandle.killReplica();
 	}
 }

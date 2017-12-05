@@ -33,6 +33,12 @@ public class ProcessHandler {
 				cmdarray[1] = "" + (port + 1);
 				replica.add(runtime.exec(replicaPath));
 			}
+			
+			for (int i=0; i<replica.size(); i++){
+				Process p = replica.get(i);
+				p = runtime.exec(replicaPath);
+			}
+			
 			resetVM();
 		} catch (IOException e) {
 			e.printStackTrace();
