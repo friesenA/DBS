@@ -39,6 +39,15 @@ public class ProcessHandler {
 		}
 	}
 	
+	public synchronized boolean isActive(int value){
+		if (replica.get(value-1).isAlive()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
 	/**
 	 * Kill replica
 	 * @return
